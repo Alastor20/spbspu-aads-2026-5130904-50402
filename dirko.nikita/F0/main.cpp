@@ -1,3 +1,4 @@
+#include <iostream>
 #include <SDL2/SDL.h>
 
 #define MUS_PATH "C1.wav"
@@ -46,9 +47,15 @@ int main(int argc, char *argv[])
   /* Start playing */
   SDL_PauseAudio(0);
 
+  char quit = 'n';
   // wait until we're don't playing
   while (audio_len > 0) {
     SDL_Delay(100);
+    std::cin >> quit;
+    std::cout << "Got " << quit << '\n';
+    if (quit == 'q') {
+      break;
+    }
   }
 
   // shut everything down
