@@ -4,12 +4,11 @@
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
-#include <new>
 #include <stdexcept>
 #include <utility>
 namespace dirko
 {
-  template < class Key, class Value >
+  template< class Key, class Value >
   struct TreeNode
   {
     Key key_;
@@ -18,10 +17,11 @@ namespace dirko
     TreeNode *right_;
     TreeNode *parent_;
 
+    TreeNode();
     TreeNode(const Key &key, const Value &value, TreeNode *parent);
     TreeNode(Key &&key, Value &&value, TreeNode *parent);
   };
-  template < class Key, class Value >
+  template< class Key, class Value >
   class BSTIterator
   {
   public:
@@ -34,13 +34,13 @@ namespace dirko
     bool operator==(const BSTIterator &other) const;
     bool operator!=(const BSTIterator &other) const;
 
-    template < class K, class V, class Compare >
+    template< class K, class V, class Compare >
     friend class BSTree;
 
   private:
     TreeNode< Key, Value > *curr_;
   };
-  template < class Key, class Value >
+  template< class Key, class Value >
   class BSTConstIterator
   {
   public:
@@ -53,14 +53,14 @@ namespace dirko
     bool operator==(const BSTConstIterator &other) const;
     bool operator!=(const BSTConstIterator &other) const;
 
-    template < class K, class V, class Compare >
+    template< class K, class V, class Compare >
     friend class BSTree;
 
   private:
     TreeNode< Key, Value > *curr_;
   };
 
-  template < class Key, class Value, class Compare = std::less< Key > >
+  template< class Key, class Value, class Compare = std::less< Key > >
   class BSTree
   {
   public:
@@ -116,7 +116,16 @@ namespace dirko
   };
 }
 
-template < class Key, class Value >
+template< class Key, class Value >
+dirko::TreeNode< Key, Value >::TreeNode():
+  key_(Key()),
+  value_(Value()),
+  left_(nullptr),
+  right_(nullptr),
+  parent_(nullptr)
+{}
+
+template< class Key, class Value >
 dirko::TreeNode< Key, Value >::TreeNode(const Key &key, const Value &value, TreeNode *parent):
   key_(key),
   value_(value),
@@ -124,7 +133,7 @@ dirko::TreeNode< Key, Value >::TreeNode(const Key &key, const Value &value, Tree
   right_(nullptr),
   parent_(parent)
 {}
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::TreeNode< Key, Value >::TreeNode(Key &&key, Value &&value, TreeNode *parent):
   key_(std::move(key)),
   value_(std::move(value)),
@@ -133,26 +142,23 @@ dirko::TreeNode< Key, Value >::TreeNode(Key &&key, Value &&value, TreeNode *pare
   parent_(parent)
 {}
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTree< Key, Value, Compare >::BSTree():
-  root_(static_cast< TreeNode< Key, Value > * >(::operator new(sizeof(TreeNode< Key, Value >)))),
+  root_(new TreeNode< Key, Value >()),
   size_(0),
   comp_(Compare{})
-{
-  root_->right_ = nullptr;
-}
-template < class Key, class Value, class Compare >
+{}
+template< class Key, class Value, class Compare >
 dirko::BSTree< Key, Value, Compare >::BSTree(const BSTree &other):
-  root_(static_cast< TreeNode< Key, Value > * >(::operator new(sizeof(TreeNode< Key, Value >)))),
+  root_(new TreeNode< Key, Value >()),
   size_(0),
   comp_(other.comp_)
 {
-  root_->right_ = nullptr;
   for (const std::pair< Key, Value > &v : other) {
     push(v.first, v.second);
   }
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTree< Key, Value, Compare >::BSTree(BSTree &&other) noexcept:
   root_(other.root_),
   size_(other.size_),
@@ -161,30 +167,29 @@ dirko::BSTree< Key, Value, Compare >::BSTree(BSTree &&other) noexcept:
   other.root_ = nullptr;
   other.size_ = 0;
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTree< Key, Value, Compare >::BSTree(std::initializer_list< std::pair< Key, Value > > il):
-  root_(static_cast< TreeNode< Key, Value > * >(::operator new(sizeof(TreeNode< Key, Value >)))),
+  root_(new TreeNode< Key, Value >()),
   size_(0),
   comp_(Compare{})
 {
-  root_->right_ = nullptr;
   for (const std::pair< Key, Value > &v : il) {
     push(v.first, v.second);
   }
 }
 
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTIterator< Key, Value >::BSTIterator(TreeNode< Key, Value > *node):
   curr_(node)
 {}
 
-template < class Key, class Value >
+template< class Key, class Value >
 std::pair< const Key, Value > dirko::BSTIterator< Key, Value >::operator*()
 {
   return {curr_->key_, curr_->value_};
 }
 
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTIterator< Key, Value > &dirko::BSTIterator< Key, Value >::operator++()
 {
   if (!curr_) {
@@ -205,14 +210,14 @@ dirko::BSTIterator< Key, Value > &dirko::BSTIterator< Key, Value >::operator++()
   }
   return *this;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTIterator< Key, Value > dirko::BSTIterator< Key, Value >::operator++(int)
 {
   BSTIterator ret = *this;
   ++(*this);
   return ret;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTIterator< Key, Value > &dirko::BSTIterator< Key, Value >::operator--()
 {
   if (!curr_) {
@@ -234,37 +239,37 @@ dirko::BSTIterator< Key, Value > &dirko::BSTIterator< Key, Value >::operator--()
   }
   return *this;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTIterator< Key, Value > dirko::BSTIterator< Key, Value >::operator--(int)
 {
   BSTIterator ret = *this;
   --(*this);
   return ret;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 bool dirko::BSTIterator< Key, Value >::operator==(const BSTIterator &other) const
 {
   return curr_ == other.curr_;
 }
 
-template < class Key, class Value >
+template< class Key, class Value >
 bool dirko::BSTIterator< Key, Value >::operator!=(const BSTIterator &other) const
 {
   return !(*this == other);
 }
 
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTConstIterator< Key, Value >::BSTConstIterator(TreeNode< Key, Value > *node):
   curr_(node)
 {}
 
-template < class Key, class Value >
+template< class Key, class Value >
 std::pair< const Key, Value > dirko::BSTConstIterator< Key, Value >::operator*() const
 {
   return {curr_->key_, curr_->value_};
 }
 
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTConstIterator< Key, Value > &dirko::BSTConstIterator< Key, Value >::operator++()
 {
   if (!curr_) {
@@ -285,14 +290,14 @@ dirko::BSTConstIterator< Key, Value > &dirko::BSTConstIterator< Key, Value >::op
   }
   return *this;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTConstIterator< Key, Value > dirko::BSTConstIterator< Key, Value >::operator++(int)
 {
   BSTConstIterator ret = *this;
   ++(*this);
   return ret;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTConstIterator< Key, Value > &dirko::BSTConstIterator< Key, Value >::operator--()
 {
   if (!curr_) {
@@ -314,37 +319,37 @@ dirko::BSTConstIterator< Key, Value > &dirko::BSTConstIterator< Key, Value >::op
   }
   return *this;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 dirko::BSTConstIterator< Key, Value > dirko::BSTConstIterator< Key, Value >::operator--(int)
 {
   BSTConstIterator ret = *this;
   --(*this);
   return ret;
 }
-template < class Key, class Value >
+template< class Key, class Value >
 bool dirko::BSTConstIterator< Key, Value >::operator==(const BSTConstIterator &other) const
 {
   return curr_ == other.curr_;
 }
 
-template < class Key, class Value >
+template< class Key, class Value >
 bool dirko::BSTConstIterator< Key, Value >::operator!=(const BSTConstIterator &other) const
 {
   return !(*this == other);
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 size_t dirko::BSTree< Key, Value, Compare >::size() const noexcept
 {
   return size_;
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 bool dirko::BSTree< Key, Value, Compare >::empty() const noexcept
 {
   return !size_;
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 void dirko::BSTree< Key, Value, Compare >::swap(BSTree &other) noexcept
 {
   std::swap(root_, other.root_);
@@ -352,41 +357,41 @@ void dirko::BSTree< Key, Value, Compare >::swap(BSTree &other) noexcept
   std::swap(comp_, other.comp_);
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::begin()
 {
   return iterator(fallLeft(root_->right_));
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::end() noexcept
 {
   return iterator(nullptr);
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::begin() const
 {
   return const_iterator(fallLeft(root_->right_));
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::end() const noexcept
 {
   return const_iterator(nullptr);
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::cbegin() const
 {
   return const_iterator(fallLeft(root_->right_));
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::cend() const noexcept
 {
   return const_iterator(nullptr);
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTree< Key, Value, Compare > &dirko::BSTree< Key, Value, Compare >::operator=(const BSTree &other)
 {
   if (this != std::addressof(other)) {
@@ -396,7 +401,7 @@ dirko::BSTree< Key, Value, Compare > &dirko::BSTree< Key, Value, Compare >::oper
   return *this;
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTree< Key, Value, Compare > &dirko::BSTree< Key, Value, Compare >::operator=(BSTree &&other) noexcept
 {
   if (this != std::addressof(other)) {
@@ -410,22 +415,22 @@ dirko::BSTree< Key, Value, Compare > &dirko::BSTree< Key, Value, Compare >::oper
   return *this;
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTree< Key, Value, Compare >::~BSTree()
 {
   if (root_) {
     clear();
-    ::operator delete(root_);
+    delete root_;
   }
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 void dirko::BSTree< Key, Value, Compare >::clear()
 {
   clearFrom(root_->right_);
   root_->right_ = nullptr;
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 void dirko::BSTree< Key, Value, Compare >::clearFrom(TreeNode< Key, Value > *node) noexcept
 {
   if (node == nullptr) {
@@ -437,7 +442,7 @@ void dirko::BSTree< Key, Value, Compare >::clearFrom(TreeNode< Key, Value > *nod
   --size_;
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 void dirko::BSTree< Key, Value, Compare >::push(const Key &k, const Value &v)
 {
   if (!root_->right_) {
@@ -468,7 +473,7 @@ void dirko::BSTree< Key, Value, Compare >::push(const Key &k, const Value &v)
   }
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::TreeNode< Key, Value > *dirko::BSTree< Key, Value, Compare >::find(Key k) const
 {
   TreeNode< Key, Value > *cur = root_->right_;
@@ -483,17 +488,17 @@ dirko::TreeNode< Key, Value > *dirko::BSTree< Key, Value, Compare >::find(Key k)
   }
   throw std::out_of_range("no such element");
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 Value &dirko::BSTree< Key, Value, Compare >::get(Key k)
 {
   return find(k)->value_;
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 const Value &dirko::BSTree< Key, Value, Compare >::get(Key k) const
 {
   return find(k)->value_;
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 void dirko::BSTree< Key, Value, Compare >::drop(Key k)
 {
   TreeNode< Key, Value > *node = find(k);
@@ -517,7 +522,7 @@ void dirko::BSTree< Key, Value, Compare >::drop(Key k)
   delete node;
   --size_;
 }
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::TreeNode< Key, Value > *dirko::BSTree< Key, Value, Compare >::fallLeft(TreeNode< Key, Value > *node) const
 {
   while (node && node->left_) {
@@ -526,13 +531,13 @@ dirko::TreeNode< Key, Value > *dirko::BSTree< Key, Value, Compare >::fallLeft(Tr
   return node;
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 size_t dirko::BSTree< Key, Value, Compare >::height() const
 {
   return height(const_iterator(root_->right_));
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 size_t dirko::BSTree< Key, Value, Compare >::height(const_iterator it) const
 {
   if (it.curr_ == nullptr) {
@@ -543,7 +548,7 @@ size_t dirko::BSTree< Key, Value, Compare >::height(const_iterator it) const
   return 1 + ((l > r) ? l : r);
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
 {
   TreeNode< Key, Value > *par = it.curr_;
@@ -568,7 +573,7 @@ dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::rota
   return const_iterator(child);
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::rotateRight(const_iterator it)
 {
   TreeNode< Key, Value > *par = it.curr_;
@@ -593,7 +598,7 @@ dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::rota
   return const_iterator(child);
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
 {
   TreeNode< Key, Value > *node = it.curr_;
@@ -604,7 +609,7 @@ dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::rota
   return rotateLeft(it);
 }
 
-template < class Key, class Value, class Compare >
+template< class Key, class Value, class Compare >
 dirko::BSTConstIterator< Key, Value > dirko::BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
 {
   TreeNode< Key, Value > *node = it.curr_;
