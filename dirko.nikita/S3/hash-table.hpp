@@ -6,6 +6,7 @@
 #include <hasher.hpp>
 #include <initializer_list>
 #include <list.hpp>
+#include <memory>
 #include <stdexcept>
 #include <utility>
 
@@ -35,6 +36,8 @@ namespace dirko
     HTIt end() noexcept;
     HTCIt cbegin() const noexcept;
     HTCIt cend() const noexcept;
+
+    double loadFactor() const noexcept;
 
     void clear() noexcept;
     size_t size() const noexcept;
@@ -382,5 +385,11 @@ template< class Key, class Value, class Hash, class Equal >
 std::pair< Key, Value > &dirko::HTCIter< Key, Value, Hash, Equal >::operator*() noexcept
 {
   return *lit_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+double dirko::HashTable< Key, Value, Hash, Equal >::loadFactor() const noexcept
+{
+  return static_cast< double >(elements_) / slots_;
 }
 #endif
