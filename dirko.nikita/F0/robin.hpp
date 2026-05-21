@@ -2,6 +2,7 @@
 #define ROBIN_HPP
 
 #include <cstddef>
+#include <memory>
 #include <utility>
 #include "../common/Vector.hpp"
 #include "../common/hasher.hpp"
@@ -64,7 +65,7 @@ namespace dirko
   {
   public:
     RTIter();
-    RTIter(Vector< List< std::pair< Key, Value > > > *, size_t);
+    RTIter(Vector< RobinNode< Key, Value > > *, size_t, LIter< std::pair< Key, Value > >);
 
     RTIter &operator++();
     RTIter operator++(int);
@@ -83,7 +84,7 @@ namespace dirko
   {
   public:
     RTCIter();
-    RTCIter(Vector< List< std::pair< Key, Value > > > *, size_t);
+    RTCIter(Vector< RobinNode< Key, Value > > *, size_t, LCIter< std::pair< Key, Value > >);
 
     RTCIter &operator++();
     RTCIter operator++(int);
@@ -158,5 +159,36 @@ dirko::RobinTable< Key, Value, Hash, Equal >::RobinTable(std::initializer_list< 
   for (const std::pair< Key, Value > &v : il) {
     add(v.first, v.second);
   }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::begin() noexcept
+{
+  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), 0, overflow_.begin());
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::end() noexcept
+{
+  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), bucket_size_ * buckets_, overflow_.end());
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::begin() const noexcept
+{
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), 0, overflow_.cbegin());
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::end() const noexcept
+{
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), bucket_size_ * buckets_, overflow_.cend());
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::cbegin() const noexcept
+{
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), 0, overflow_.cbegin());
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::cend() const noexcept
+{
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), bucket_size_ * buckets_, overflow_.cend());
 }
 #endif
