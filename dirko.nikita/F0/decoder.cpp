@@ -18,7 +18,7 @@ void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
     throw std::runtime_error("Not a RIFF file");
   }
 
-  uint32_t chunkSize;
+  uint32_t chunkSize = 0;
   file.read(reinterpret_cast< char * >(&chunkSize), 4);
 
   char wave[4];
@@ -30,16 +30,12 @@ void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
 
   bool fmtFound = false;
   bool dataFound = false;
-  for (size_t i = 0; !file.eof(); ++i) {
-    char chunkId[4];
-    uint32_t chunkSize = 0;
+  char chunkId[4];
 
-    file.read(chunkId, 4);
-
-    if (file.eof())
-      break;
-
-    file.read(reinterpret_cast< char * >(&chunkSize), 4);
+  // Безопасное чтение: цикл продолжается, пока успешно считываются 4 байта ID чанка
+  while (file.read(chunkId, 4)) {
+    uint32_t subChunkSize = 0;
+    file.read(reinterpret_cast< char * >(&subChunkSize), 4);
 
     if (std::strncmp(chunkId, "fmt ", 4) == 0) {
       fmtFound = true;
@@ -51,18 +47,19 @@ void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
       file.read(reinterpret_cast< char * >(&outWav.blockAlign), 2);
       file.read(reinterpret_cast< char * >(&outWav.bitsPerSample), 2);
 
-      // Skip extra fmt bytes if present
-      if (chunkSize > 16) {
-        file.seekg(chunkSize - 16, std::ios::cur);
+      // Пропускаем дополнительные байты fmt, если они есть
+      if (subChunkSize > 16) {
+        file.seekg(subChunkSize - 16, std::ios::cur);
       }
     } else if (std::strncmp(chunkId, "data", 4) == 0) {
       dataFound = true;
 
-      outWav.rawData.reserve(chunkSize);
-      file.read(reinterpret_cast< char * >(outWav.rawData[i]), chunkSize);
+      // ФИКС: Используем resize, чтобы Vector обновил свой внутренний size
+      outWav.rawData.resize(subChunkSize);
+      file.read(reinterpret_cast< char * >(outWav.rawData.getData()), subChunkSize);
     } else {
-      // Skip unknown chunk
-      file.seekg(chunkSize, std::ios::cur);
+      // Корректно пропускаем неизвестный чанк
+      file.seekg(subChunkSize, std::ios::cur);
     }
   }
 

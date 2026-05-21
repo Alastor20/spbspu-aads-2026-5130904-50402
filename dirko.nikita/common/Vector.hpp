@@ -65,8 +65,10 @@ namespace dirko
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
+    T *getData() noexcept;
     size_t getCapasity() const noexcept;
     void reserve(size_t cap);
+    void resize(size_t size);
     void shrinkToFit();
 
     void swap(Vector< T > &rhs) noexcept;
@@ -105,6 +107,12 @@ namespace dirko
   };
   template< class T >
   void clear(T *data, size_t to_pos);
+}
+
+template< class T >
+T *dirko::Vector< T >::getData() noexcept
+{
+  return data_;
 }
 
 template< class T >
@@ -478,6 +486,13 @@ void dirko::Vector< T >::reserve(size_t cap)
   clear(data_, size_);
   data_ = d;
   capasity_ = cap;
+}
+
+template< class T >
+void dirko::Vector< T >::resize(size_t size)
+{
+  reserve(size);
+  size_ = size;
 }
 
 template< class T >
