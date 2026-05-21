@@ -32,12 +32,14 @@ namespace dirko
     Value &get(Key k);
     const Value get(Key k) const;
     bool has(Key k) const noexcept;
-    void rehash(size_t slots);
+    void rehash(size_t buckets, size_t bucket_size);
 
     using RTIt = RTIter< Key, Value, Hash, Equal >;
     using RTCIt = RTCIter< Key, Value, Hash, Equal >;
     RTIt begin() noexcept;
     RTIt end() noexcept;
+    RTCIt begin() const noexcept;
+    RTCIt end() const noexcept;
     RTCIt cbegin() const noexcept;
     RTCIt cend() const noexcept;
 
@@ -118,5 +120,33 @@ dirko::RobinTable< Key, Value, Hash, Equal >::RobinTable(size_t buckets, size_t 
   for (size_t i = 0; i < buckets * bucket_size; ++i) {
     data_.pushBack(RobinNode< Key, Value >());
   }
+}
+template< class Key, class Value, class Hash, class Equal >
+size_t dirko::RobinTable< Key, Value, Hash, Equal >::size() const noexcept
+{
+  return elements_;
+}
+template< class Key, class Value, class Hash, class Equal >
+bool dirko::RobinTable< Key, Value, Hash, Equal >::empty() const noexcept
+{
+  return !elements_;
+}
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RobinTable< Key, Value, Hash, Equal >::swap(RobinTable &other) noexcept
+{
+  data_.swap(other.data_);
+  std::swap(hasher_, other.hasher_);
+  std::swap(comparator_, other.comparator_);
+  std::swap(buckets_, other.buckets_);
+  std::swap(bucket_size_, other.bucket_size_);
+  std::swap(elements_, other.elements_);
+  overflow_.swap(other.overflow_);
+}
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RobinTable< Key, Value, Hash, Equal >::clear() noexcept
+{
+  data_.clear();
+  overflow_.clear();
+  elements_ = 0;
 }
 #endif
