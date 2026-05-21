@@ -81,6 +81,8 @@ namespace dirko
     T &at(size_t id);
     const T &at(size_t id) const;
 
+    void clear();
+
     void insert(size_t i, const T &val);
     void erase(size_t i);
     void insert(size_t i, const Vector< T > &rhs, size_t beg, size_t end);
@@ -493,6 +495,14 @@ void dirko::Vector< T >::resize(size_t size)
 {
   reserve(size);
   size_ = size;
+}
+
+template< class T >
+void dirko::Vector< T >::clear()
+{
+  for (size_t j = 0; j < size_; ++j) {
+    (data_ + j)->~T();
+  }
 }
 
 template< class T >
