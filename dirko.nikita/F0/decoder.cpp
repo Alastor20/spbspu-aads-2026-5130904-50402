@@ -32,7 +32,6 @@ void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
   bool dataFound = false;
   char chunkId[4];
 
-  // Безопасное чтение: цикл продолжается, пока успешно считываются 4 байта ID чанка
   while (file.read(chunkId, 4)) {
     uint32_t subChunkSize = 0;
     file.read(reinterpret_cast< char * >(&subChunkSize), 4);
@@ -47,18 +46,15 @@ void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
       file.read(reinterpret_cast< char * >(&outWav.blockAlign), 2);
       file.read(reinterpret_cast< char * >(&outWav.bitsPerSample), 2);
 
-      // Пропускаем дополнительные байты fmt, если они есть
       if (subChunkSize > 16) {
         file.seekg(subChunkSize - 16, std::ios::cur);
       }
     } else if (std::strncmp(chunkId, "data", 4) == 0) {
       dataFound = true;
 
-      // ФИКС: Используем resize, чтобы Vector обновил свой внутренний size
       outWav.rawData.resize(subChunkSize);
       file.read(reinterpret_cast< char * >(outWav.rawData.getData()), subChunkSize);
     } else {
-      // Корректно пропускаем неизвестный чанк
       file.seekg(subChunkSize, std::ios::cur);
     }
   }
