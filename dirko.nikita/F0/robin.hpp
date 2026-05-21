@@ -191,4 +191,14 @@ dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, E
 {
   return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), bucket_size_ * buckets_, overflow_.cend());
 }
+
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RobinTable< Key, Value, Hash, Equal >::rehash(size_t buckets, size_t bucket_size)
+{
+  RobinTable< Key, Value, Hash, Equal > cpy(buckets, bucket_size);
+  for (const std::pair< Key, Value > &v : *this) {
+    cpy.add(v.first, v.second);
+  }
+  swap(cpy);
+}
 #endif
