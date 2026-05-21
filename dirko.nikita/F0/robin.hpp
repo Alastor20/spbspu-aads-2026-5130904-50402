@@ -16,6 +16,7 @@ namespace dirko
     size_t psl_;
     bool notEmpty_;
     RobinNode();
+    void swap(RobinNode &other);
   };
   template< class Key, class Value, class Hash, class Equal >
   class RTIter;
@@ -25,7 +26,7 @@ namespace dirko
   class RobinTable
   {
   public:
-    explicit RobinTable(size_t buckets, size_t bucket_size);
+    explicit RobinTable(size_t slots, float load);
     RobinTable(std::initializer_list< std::pair< Key, Value > > il);
 
     void add(Key k, Value v);
@@ -33,7 +34,7 @@ namespace dirko
     Value &get(Key k);
     const Value get(Key k) const;
     bool has(Key k) const noexcept;
-    void rehash(size_t buckets, size_t bucket_size);
+    void rehash(size_t slots);
 
     using RTIt = RTIter< Key, Value, Hash, Equal >;
     using RTCIt = RTCIter< Key, Value, Hash, Equal >;
@@ -53,10 +54,9 @@ namespace dirko
     Vector< RobinNode< Key, Value > > data_;
     Hash hasher_;
     Equal comparator_;
-    size_t buckets_;
-    size_t bucket_size_;
+    size_t slots_;
     size_t elements_;
-    List< std::pair< Key, Value > > overflow_;
+    float max_load_;
     friend class RTIter< Key, Value, Hash, Equal >;
     friend class RTCIter< Key, Value, Hash, Equal >;
   };
@@ -76,7 +76,6 @@ namespace dirko
   private:
     Vector< RobinNode< Key, Value > > *data_;
     size_t id_;
-    LIter< std::pair< Key, Value > > overflow_;
     void next();
   };
   template< class Key, class Value, class Hash, class Equal >
@@ -95,7 +94,6 @@ namespace dirko
   private:
     Vector< RobinNode< Key, Value > > *data_;
     size_t id_;
-    LCIter< std::pair< Key, Value > > overflow_;
     void next();
   };
 }
@@ -108,17 +106,16 @@ dirko::RobinNode< Key, Value >::RobinNode():
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-dirko::RobinTable< Key, Value, Hash, Equal >::RobinTable(size_t buckets, size_t bucket_size):
+dirko::RobinTable< Key, Value, Hash, Equal >::RobinTable(size_t slots, float load):
   data_(),
   hasher_(Hash{}),
   comparator_(Equal{}),
-  buckets_(buckets),
-  bucket_size_(bucket_size),
+  slots_(slots),
   elements_(0),
-  overflow_()
+  max_load_(load)
 {
-  data_.reserve(bucket_size * buckets);
-  for (size_t i = 0; i < buckets * bucket_size; ++i) {
+  data_.reserve(slots);
+  for (size_t i = 0; i < slots; ++i) {
     data_.pushBack(RobinNode< Key, Value >());
   }
 }
@@ -138,16 +135,14 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::swap(RobinTable &other) noexc
   data_.swap(other.data_);
   std::swap(hasher_, other.hasher_);
   std::swap(comparator_, other.comparator_);
-  std::swap(buckets_, other.buckets_);
-  std::swap(bucket_size_, other.bucket_size_);
+  std::swap(slots_, other.slots_);
   std::swap(elements_, other.elements_);
-  overflow_.swap(other.overflow_);
+  std::swap(max_load_, other.max_load_);
 }
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RobinTable< Key, Value, Hash, Equal >::clear() noexcept
 {
   data_.clear();
-  overflow_.clear();
   elements_ = 0;
 }
 
@@ -164,41 +159,71 @@ dirko::RobinTable< Key, Value, Hash, Equal >::RobinTable(std::initializer_list< 
 template< class Key, class Value, class Hash, class Equal >
 dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::begin() noexcept
 {
-  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), 0, overflow_.begin());
+  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), 0);
 }
 template< class Key, class Value, class Hash, class Equal >
 dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::end() noexcept
 {
-  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), bucket_size_ * buckets_, overflow_.end());
+  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), slots_);
 }
 template< class Key, class Value, class Hash, class Equal >
 dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::begin() const noexcept
 {
-  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), 0, overflow_.cbegin());
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), 0);
 }
 template< class Key, class Value, class Hash, class Equal >
 dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::end() const noexcept
 {
-  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), bucket_size_ * buckets_, overflow_.cend());
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), slots_);
 }
 template< class Key, class Value, class Hash, class Equal >
 dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::cbegin() const noexcept
 {
-  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), 0, overflow_.cbegin());
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), 0);
 }
 template< class Key, class Value, class Hash, class Equal >
 dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::cend() const noexcept
 {
-  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), bucket_size_ * buckets_, overflow_.cend());
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), slots_);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void dirko::RobinTable< Key, Value, Hash, Equal >::rehash(size_t buckets, size_t bucket_size)
+void dirko::RobinTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 {
-  RobinTable< Key, Value, Hash, Equal > cpy(buckets, bucket_size);
+  RobinTable< Key, Value, Hash, Equal > cpy(slots, max_load_);
   for (const std::pair< Key, Value > &v : *this) {
     cpy.add(v.first, v.second);
   }
   swap(cpy);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RobinTable< Key, Value, Hash, Equal >::add(Key k, Value v)
+{
+  if (has(k)) {
+    get(k) = v;
+    return;
+  }
+  if (elements_ >= slots_ * max_load_) {
+    rehash(empty() ? 16 : slots_ * 2);
+  }
+  size_t id = hasher_(k) % slots_;
+  size_t psl = 0;
+  while (true) {
+    if (!data_[id].notEmpty_) {
+      data_[id].val_ = {k, v};
+      data_[id].psl_ = psl;
+      data_[id].notEmpty_ = true;
+      ++elements_;
+      return;
+    }
+    if (data_[id].psl_ < psl) {
+      std::swap(k, data_[id].val_.first);
+      std::swap(v, data_[id].val_.second);
+      std::swap(psl, data_[id].psl_);
+    }
+    id = (id + 1) % slots_;
+    ++psl;
+  }
 }
 #endif
