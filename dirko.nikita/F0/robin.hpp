@@ -149,4 +149,14 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::clear() noexcept
   overflow_.clear();
   elements_ = 0;
 }
+
+template< class Key, class Value, class Hash, class Equal >
+dirko::RobinTable< Key, Value, Hash, Equal >::RobinTable(std::initializer_list< std::pair< Key, Value > > il):
+  RobinTable(il.size(), 5)
+{
+  data_.reserve(il.size());
+  for (const std::pair< Key, Value > &v : il) {
+    add(v.first, v.second);
+  }
+}
 #endif
