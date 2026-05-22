@@ -7,7 +7,6 @@
 #include <utility>
 #include "../common/Vector.hpp"
 #include "../common/hasher.hpp"
-#include "../common/list.hpp"
 namespace dirko
 {
   template< class Key, class Value >
@@ -66,7 +65,7 @@ namespace dirko
   {
   public:
     RTIter();
-    RTIter(Vector< RobinNode< Key, Value > > *, size_t, LIter< std::pair< Key, Value > >);
+    RTIter(Vector< RobinNode< Key, Value > > *, size_t);
 
     RTIter &operator++();
     RTIter operator++(int);
@@ -84,13 +83,13 @@ namespace dirko
   {
   public:
     RTCIter();
-    RTCIter(Vector< RobinNode< Key, Value > > *, size_t, LCIter< std::pair< Key, Value > >);
+    RTCIter(Vector< RobinNode< Key, Value > > *, size_t);
 
     RTCIter &operator++();
     RTCIter operator++(int);
     bool operator==(const RTCIter &other) const noexcept;
     bool operator!=(const RTCIter &other) const noexcept;
-    std::pair< Key, Value > &operator*() noexcept;
+    std::pair< Key, Value > &operator*() const noexcept;
 
   private:
     Vector< RobinNode< Key, Value > > *data_;
@@ -238,6 +237,7 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::drop(Key k)
     throw std::invalid_argument("No such key");
   }
   size_t id = hasher_(k) % slots_;
+  size_t cycle = id;
   while (data_[id].notEmpty_) {
     if (comparator_(k, data_[id].val_.first)) {
       size_t curr = id;
@@ -254,6 +254,9 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::drop(Key k)
       return;
     }
     id = (id + 1) % slots_;
+    if (id == cycle) {
+      throw std::invalid_argument("No such key");
+    }
   }
 }
 
@@ -284,12 +287,17 @@ Value &dirko::RobinTable< Key, Value, Hash, Equal >::get(Key k)
     throw std::invalid_argument("No such key");
   }
   size_t id = hasher_(k) % slots_;
+  size_t cycle = id;
   while (data_[id].notEmpty_) {
     if (comparator_(k, data_[id].val_.first)) {
       return data_[id].val_.second;
     }
     id = (id + 1) % slots_;
+    if (id == cycle) {
+      throw std::invalid_argument("No such key");
+    }
   }
+  throw std::invalid_argument("No such key");
 }
 template< class Key, class Value, class Hash, class Equal >
 const Value &dirko::RobinTable< Key, Value, Hash, Equal >::get(Key k) const
@@ -298,11 +306,144 @@ const Value &dirko::RobinTable< Key, Value, Hash, Equal >::get(Key k) const
     throw std::invalid_argument("No such key");
   }
   size_t id = hasher_(k) % slots_;
+  size_t cycle = id;
   while (data_[id].notEmpty_) {
     if (comparator_(k, data_[id].val_.first)) {
       return data_[id].val_.second;
     }
     id = (id + 1) % slots_;
+    if (id == cycle) {
+      throw std::invalid_argument("No such key");
+    }
+  }
+  throw std::invalid_argument("No such key");
+}
+
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTIter< Key, Value, Hash, Equal >::RTIter():
+  data_(nullptr),
+  id_(0)
+{}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTIter< Key, Value, Hash, Equal >::RTIter(Vector< RobinNode< Key, Value > > *data, size_t id):
+  data_(data),
+  id_(id)
+{
+  next();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool dirko::RTIter< Key, Value, Hash, Equal >::operator==(const RTIter< Key, Value, Hash, Equal > &other) const noexcept
+{
+  if (data_ == nullptr && other.data_ == nullptr) {
+    return true;
+  }
+  if (data_ == nullptr || other.data_ == nullptr) {
+    return false;
+  }
+  if (id_ >= data_->getSize() && other.id_ >= other.data_->getSize()) {
+    return true;
+  }
+  return (*data_)[id_].val_ == (*other.data_)[other.id_].val_ && other.id_ == id_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool dirko::RTIter< Key, Value, Hash, Equal >::operator!=(const RTIter< Key, Value, Hash, Equal > &other) const noexcept
+{
+  return !(*this == other);
+}
+template< class Key, class Value, class Hash, class Equal >
+std::pair< Key, Value > &dirko::RTIter< Key, Value, Hash, Equal >::operator*() noexcept
+{
+  return (*data_)[id_].val_;
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTIter< Key, Value, Hash, Equal > &dirko::RTIter< Key, Value, Hash, Equal >::operator++()
+{
+  next();
+  return *this;
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTIter< Key, Value, Hash, Equal > dirko::RTIter< Key, Value, Hash, Equal >::operator++(int)
+{
+  RTIter< Key, Value, Hash, Equal > ret = *this;
+  next();
+  return ret;
+}
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RTIter< Key, Value, Hash, Equal >::next()
+{
+  ++id_;
+  while (!(*data_)[id_].notEmpty_ && id_ < data_->getSize()) {
+    ++id_;
+  }
+  if (id_ >= data_->getSize()) {
+    throw std::out_of_range("out of range");
+  }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal >::RTCIter():
+  data_(nullptr),
+  id_(0)
+{}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal >::RTCIter(Vector< RobinNode< Key, Value > > *data, size_t id):
+  data_(data),
+  id_(id)
+{
+  next();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool dirko::RTCIter< Key, Value, Hash, Equal >::operator==(
+    const RTCIter< Key, Value, Hash, Equal > &other) const noexcept
+{
+  if (data_ == nullptr && other.data_ == nullptr) {
+    return true;
+  }
+  if (data_ == nullptr || other.data_ == nullptr) {
+    return false;
+  }
+  if (id_ >= data_->getSize() && other.id_ >= other.data_->getSize()) {
+    return true;
+  }
+  return (*data_)[id_].val_ == (*other.data_)[other.id_].val_ && other.id_ == id_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool dirko::RTCIter< Key, Value, Hash, Equal >::operator!=(
+    const RTCIter< Key, Value, Hash, Equal > &other) const noexcept
+{
+  return !(*this == other);
+}
+template< class Key, class Value, class Hash, class Equal >
+std::pair< Key, Value > &dirko::RTCIter< Key, Value, Hash, Equal >::operator*() const noexcept
+{
+  return (*data_)[id_].val_;
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal > &dirko::RTCIter< Key, Value, Hash, Equal >::operator++()
+{
+  next();
+  return *this;
+}
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal > dirko::RTCIter< Key, Value, Hash, Equal >::operator++(int)
+{
+  RTCIter< Key, Value, Hash, Equal > ret = *this;
+  next();
+  return ret;
+}
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RTCIter< Key, Value, Hash, Equal >::next()
+{
+  ++id_;
+  while (!(*data_)[id_].notEmpty_ && id_ < data_->getSize()) {
+    ++id_;
+  }
+  if (id_ >= data_->getSize()) {
+    throw std::out_of_range("out of range");
   }
 }
 #endif
