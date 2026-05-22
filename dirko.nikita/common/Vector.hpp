@@ -108,7 +108,7 @@ namespace dirko
     void reserve(size_t pos, size_t k);
   };
   template< class T >
-  void clear(T *data, size_t to_pos);
+  void cleanUp(T *data, size_t to_pos);
 }
 
 template< class T >
@@ -189,7 +189,7 @@ dirko::Vector< T >::Vector(size_t k):
 template< class T >
 dirko::Vector< T >::~Vector()
 {
-  clear(data_, size_);
+  cleanUp(data_, size_);
 }
 
 template< class T >
@@ -485,7 +485,7 @@ void dirko::Vector< T >::reserve(size_t cap)
   for (; i < getSize(); ++i) {
     new (d + i) T(std::move(data_[i]));
   }
-  clear(data_, size_);
+  cleanUp(data_, size_);
   data_ = d;
   capasity_ = cap;
 }
@@ -506,7 +506,7 @@ void dirko::Vector< T >::clear()
 }
 
 template< class T >
-void dirko::clear(T *data, size_t count)
+void dirko::cleanUp(T *data, size_t count)
 {
   for (size_t j = 0; j < count; ++j) {
     (data + j)->~T();
