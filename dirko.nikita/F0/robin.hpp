@@ -374,11 +374,15 @@ template< class Key, class Value, class Hash, class Equal >
 void dirko::RTIter< Key, Value, Hash, Equal >::next()
 {
   ++id_;
-  while (!(*data_)[id_].notEmpty_ && id_ < data_->getSize()) {
+  if (id_ >= data_->getSize()) {
+    data_ = nullptr;
+    return;
+  }
+  while (id_ < data_->getSize() && !(*data_)[id_].notEmpty_) {
     ++id_;
   }
   if (id_ >= data_->getSize()) {
-    throw std::out_of_range("out of range");
+    data_ = nullptr;
   }
 }
 
@@ -439,7 +443,7 @@ template< class Key, class Value, class Hash, class Equal >
 void dirko::RTCIter< Key, Value, Hash, Equal >::next()
 {
   ++id_;
-  while (!(*data_)[id_].notEmpty_ && id_ < data_->getSize()) {
+  while (id_ < data_->getSize() && !(*data_)[id_].notEmpty_) {
     ++id_;
   }
   if (id_ >= data_->getSize()) {

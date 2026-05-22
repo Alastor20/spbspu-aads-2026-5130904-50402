@@ -8,14 +8,14 @@ BOOST_AUTO_TEST_SUITE(RobinTableTests)
 
 BOOST_AUTO_TEST_CASE(test_default_constructor)
 {
-  RobinTable< std::string, int > rt(16, .5);
+  RobinTable< std::string, int > rt(16, .7);
   BOOST_CHECK(rt.empty());
   BOOST_CHECK_EQUAL(rt.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_add_and_size)
 {
-  RobinTable< std::string, int > rt(16, .5);
+  RobinTable< std::string, int > rt(16, .7);
   rt.add("one", 1);
   BOOST_CHECK_EQUAL(rt.size(), 1);
   BOOST_CHECK(!rt.empty());
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(test_add_and_size)
 
 BOOST_AUTO_TEST_CASE(test_has)
 {
-  RobinTable< std::string, int > rt(16, .5);
+  RobinTable< std::string, int > rt(16, .7);
   rt.add("one", 1);
   rt.add("two", 2);
 
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(test_has)
 
 BOOST_AUTO_TEST_CASE(test_get)
 {
-  RobinTable< std::string, int > rt(16, .5);
+  RobinTable< std::string, int > rt(16, .7);
   rt.add("one", 1);
   rt.add("two", 2);
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_drop)
 
 BOOST_AUTO_TEST_CASE(test_add_update_existing)
 {
-  RobinTable< std::string, int > rt(16, .5);
+  RobinTable< std::string, int > rt(16, .7);
   rt.add("key", 1);
   rt.add("key", 2);
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_add_update_existing)
 
 BOOST_AUTO_TEST_CASE(test_clear)
 {
-  RobinTable< std::string, int > rt(16, .5);
+  RobinTable< std::string, int > rt(16, .7);
   rt.add("one", 1);
   rt.add("two", 2);
   rt.add("three", 3);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_clear)
 
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
 {
-  RobinTable< std::string, int > rt1(16, .5);
+  RobinTable< std::string, int > rt1(16, .7);
   rt1.add("one", 1);
   rt1.add("two", 2);
 
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_init_list)
 
 BOOST_AUTO_TEST_CASE(test_move_constructor)
 {
-  RobinTable< std::string, int > rt1(16, .5);
+  RobinTable< std::string, int > rt1(16, .7);
   rt1.add("one", 1);
   rt1.add("two", 2);
 
@@ -122,14 +122,14 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
 
 BOOST_AUTO_TEST_CASE(test_rehash)
 {
-  RobinTable< std::string, int > rt(16, .5);
+  RobinTable< std::string, int > rt(10, .7);
   rt.add("one", 1);
   rt.add("two", 2);
   rt.add("three", 3);
   rt.add("four", 4);
   rt.add("five", 5);
 
-  rt.rehash(16);
+  rt.rehash(20);
   BOOST_CHECK_EQUAL(rt.size(), 5);
   BOOST_CHECK(rt.has("one"));
   BOOST_CHECK(rt.has("two"));
