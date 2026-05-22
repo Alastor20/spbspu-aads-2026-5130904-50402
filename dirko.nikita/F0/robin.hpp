@@ -33,7 +33,7 @@ namespace dirko
     void add(Key k, Value v);
     void drop(Key k);
     Value &get(Key k);
-    const Value get(Key k) const;
+    const Value &get(Key k) const;
     bool has(Key k) const noexcept;
     void rehash(size_t slots);
 
@@ -275,5 +275,34 @@ bool dirko::RobinTable< Key, Value, Hash, Equal >::has(Key k) const noexcept
     }
   }
   return false;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value &dirko::RobinTable< Key, Value, Hash, Equal >::get(Key k)
+{
+  if (!has(k)) {
+    throw std::invalid_argument("No such key");
+  }
+  size_t id = hasher_(k) % slots_;
+  while (data_[id].notEmpty_) {
+    if (comparator_(k, data_[id].val_.first)) {
+      return data_[id].val_.second;
+    }
+    id = (id + 1) % slots_;
+  }
+}
+template< class Key, class Value, class Hash, class Equal >
+const Value &dirko::RobinTable< Key, Value, Hash, Equal >::get(Key k) const
+{
+  if (!has(k)) {
+    throw std::invalid_argument("No such key");
+  }
+  size_t id = hasher_(k) % slots_;
+  while (data_[id].notEmpty_) {
+    if (comparator_(k, data_[id].val_.first)) {
+      return data_[id].val_.second;
+    }
+    id = (id + 1) % slots_;
+  }
 }
 #endif
