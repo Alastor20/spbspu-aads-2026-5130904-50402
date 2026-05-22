@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 #include "../common/Vector.hpp"
 #include "../common/hasher.hpp"
@@ -224,6 +225,35 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::add(Key k, Value v)
     }
     id = (id + 1) % slots_;
     ++psl;
+  }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RobinTable< Key, Value, Hash, Equal >::drop(Key k)
+{
+  if (data_.isEmpty()) {
+    return;
+  }
+  if (!has(k)) {
+    throw std::invalid_argument("No such key");
+  }
+  size_t id = hasher_(k) % slots_;
+  while (data_[id].notEmpty_) {
+    if (comparator_(k, data_[id].val_.first)) {
+      size_t curr = id;
+      size_t next = (curr + 1) % slots_;
+      while (data_[next].notEmpty_ && data_[next].psl_ > 0) {
+        data_[curr].val_ = std::move(data_[next].val_);
+        data_[curr].psl_ = data_[next].psl_ - 1;
+        curr = next;
+        next = (next + 1) % slots_;
+      }
+      data_[curr].notEmpty_ = false;
+      data_[curr].psl_ = 0;
+      --elements_;
+      return;
+    }
+    id = (id + 1) % slots_;
   }
 }
 #endif
