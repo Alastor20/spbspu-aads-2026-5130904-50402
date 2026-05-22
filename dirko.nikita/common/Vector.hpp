@@ -503,6 +503,7 @@ void dirko::Vector< T >::clear()
   for (size_t j = 0; j < size_; ++j) {
     (data_ + j)->~T();
   }
+  size_ = 0;
 }
 
 template< class T >
