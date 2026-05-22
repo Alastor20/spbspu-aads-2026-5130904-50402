@@ -256,4 +256,24 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::drop(Key k)
     id = (id + 1) % slots_;
   }
 }
+
+template< class Key, class Value, class Hash, class Equal >
+bool dirko::RobinTable< Key, Value, Hash, Equal >::has(Key k) const noexcept
+{
+  if (data_.isEmpty()) {
+    return false;
+  }
+  size_t id = hasher_(k) % slots_;
+  size_t cycle = id;
+  while (data_[id].notEmpty_) {
+    if (comparator_(k, data_[id].val_.first)) {
+      return true;
+    }
+    id = (id + 1) % slots_;
+    if (id == cycle) {
+      return false;
+    }
+  }
+  return false;
+}
 #endif
