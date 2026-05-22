@@ -47,8 +47,10 @@ bool PlayWav(dirko::WavFile &wav, double dur)
 
   SDL_PauseAudioDevice(device, 0);
 
-  // double duration = static_cast< double >(wav.rawData.getSize()) / wav.byteRate;
-
+  double duration = static_cast< double >(wav.rawData.getSize()) / wav.byteRate;
+  if (dur > duration) {
+    return false;
+  }
   SDL_Delay(static_cast< Uint32 >(dur * 1000));
 
   SDL_CloseAudioDevice(device);
@@ -56,13 +58,15 @@ bool PlayWav(dirko::WavFile &wav, double dur)
 
   return true;
 }
-int main(int argc, char *argv[])
+int main()
 {
-  double dur = 0;
-  std::cin >> dur;
   dirko::WavFile wav;
   dirko::WavDecoder dec;
   dec.Load(MUS_PATH, wav);
 
+  double duration = static_cast< double >(wav.rawData.getSize()) / wav.byteRate;
+  std::cout << duration << '\n';
+  double dur = 0;
+  std::cin >> dur;
   PlayWav(wav, dur);
 }

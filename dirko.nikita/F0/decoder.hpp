@@ -1,8 +1,8 @@
 #ifndef DECODER_HPP
 #define DECODER_HPP
 
-#include <cstdint>
 #include <string>
+#include <SDL2/SDL.h>
 #include "../common/Vector.hpp"
 
 namespace dirko
@@ -10,14 +10,14 @@ namespace dirko
 
   struct WavFile
   {
-    uint16_t audioFormat;
-    uint16_t numChannels;
-    uint32_t sampleRate;
-    uint32_t byteRate;
-    uint16_t blockAlign;
-    uint16_t bitsPerSample;
+    Uint16 audioFormat;
+    Uint16 numChannels;
+    Uint32 sampleRate;
+    Uint32 byteRate;
+    Uint16 blockAlign;
+    Uint16 bitsPerSample;
 
-    Vector< uint8_t > rawData;
+    Vector< Uint8 > rawData;
   };
 
   class WavDecoder
