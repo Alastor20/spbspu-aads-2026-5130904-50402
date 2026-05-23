@@ -61,8 +61,7 @@ bool PlayWav(dirko::WavFile &wav, double dur)
 int main()
 {
   dirko::WavFile wav;
-  dirko::WavDecoder dec;
-  dec.Load(MUS_PATH, wav);
+  Load(MUS_PATH, wav);
 
   double duration = static_cast< double >(wav.rawData.getSize()) / wav.byteRate;
   std::cout << duration << '\n';

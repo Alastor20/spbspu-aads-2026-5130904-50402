@@ -20,10 +20,6 @@ namespace dirko
     Vector< Uint8 > rawData;
   };
 
-  class WavDecoder
-  {
-  public:
-    void Load(const std::string &filename, WavFile &outWav);
-  };
+  void Load(const std::string &filename, WavFile &outWav);
 }
 #endif

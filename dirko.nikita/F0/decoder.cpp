@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stdexcept>
 
-void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
+void dirko::Load(const std::string &filename, WavFile &outWav)
 {
   std::ifstream file(filename, std::ios::binary);
 
@@ -18,7 +18,7 @@ void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
     throw std::runtime_error("Not a RIFF file");
   }
 
-  uint32_t chunkSize = 0;
+  Uint32 chunkSize = 0;
   file.read(reinterpret_cast< char * >(&chunkSize), 4);
 
   char wave[4];
@@ -33,7 +33,7 @@ void dirko::WavDecoder::Load(const std::string &filename, WavFile &outWav)
   char chunkId[4];
 
   while (file.read(chunkId, 4)) {
-    uint32_t subChunkSize = 0;
+    Uint32 subChunkSize = 0;
     file.read(reinterpret_cast< char * >(&subChunkSize), 4);
 
     if (std::strncmp(chunkId, "fmt ", 4) == 0) {
