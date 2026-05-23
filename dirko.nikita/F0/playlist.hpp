@@ -1,3 +1,5 @@
+#ifndef PLAYLIST_HPP
+#define PLAYLIST_HPP
 #include <cstddef>
 #include <string>
 #include "decoder.hpp"
@@ -18,3 +20,4 @@ namespace dirko
   void remove(playlists_t &, catalog_t &, std::string &);
   void rename(playlists_t &, catalog_t &, std::string &, std::string &);
 }
+#endif
