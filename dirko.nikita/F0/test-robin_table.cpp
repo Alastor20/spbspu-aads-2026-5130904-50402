@@ -138,4 +138,14 @@ BOOST_AUTO_TEST_CASE(test_rehash)
   BOOST_CHECK(rt.has("five"));
 }
 
+BOOST_AUTO_TEST_CASE(test_changeKey)
+{
+  RobinTable< std::string, int > rt(10, .7);
+  rt.add("one", 2);
+  rt.changeKey("one", "two");
+  BOOST_CHECK_EQUAL(rt.size(), 1);
+  BOOST_CHECK(rt.has("two"));
+  BOOST_CHECK(!rt.has("one"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

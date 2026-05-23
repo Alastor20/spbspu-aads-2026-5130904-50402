@@ -36,6 +36,8 @@ namespace dirko
     bool has(Key k) const noexcept;
     void rehash(size_t slots);
 
+    void changeKey(Key from, Key to);
+
     using RTIt = RTIter< Key, Value, Hash, Equal >;
     using RTCIt = RTCIter< Key, Value, Hash, Equal >;
     RTIt begin() noexcept;
@@ -226,7 +228,20 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::add(Key k, Value v)
     ++psl;
   }
 }
-
+template< class Key, class Value, class Hash, class Equal >
+void dirko::RobinTable< Key, Value, Hash, Equal >::changeKey(Key from, Key to)
+{
+  if (has(to)) {
+    throw std::invalid_argument("key already exits");
+    return;
+  }
+  if (!has(from)) {
+    throw std::invalid_argument("no such element");
+    return;
+  }
+  add(to, std::move(get(from)));
+  drop(from);
+}
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RobinTable< Key, Value, Hash, Equal >::drop(Key k)
 {
