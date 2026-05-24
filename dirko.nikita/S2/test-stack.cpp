@@ -32,4 +32,14 @@ BOOST_AUTO_TEST_CASE(test_pop)
   st.pop();
   BOOST_CHECK_EQUAL(st.get(), 1);
 }
+BOOST_AUTO_TEST_CASE(test_move_push)
+{
+  Stack< std::string > queue;
+  std::string str = "faxryzen";
+
+  queue.push(std::move(str));
+
+  BOOST_CHECK_EQUAL(queue.get(), "faxryzen");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
