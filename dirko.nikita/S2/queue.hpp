@@ -9,6 +9,7 @@ namespace dirko
   {
   public:
     void push(const T &rhs);
+    void push(T &&rhs);
     T &get() noexcept;
     void pop() noexcept;
     bool empty() const noexcept;
@@ -35,6 +36,12 @@ template< class T >
 void dirko::Queue< T >::push(const T &rhs)
 {
   data_.push_back(rhs);
+}
+
+template< class T >
+void dirko::Queue< T >::push(T &&rhs)
+{
+  data_.push_back(std::move(rhs));
 }
 
 template< class T >

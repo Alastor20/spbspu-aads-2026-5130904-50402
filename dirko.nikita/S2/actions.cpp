@@ -3,7 +3,7 @@
 #include <string>
 #include "queue.hpp"
 
-dirko::Queue< std::string > dirko::parseString(std::string str)
+dirko::Queue< std::string > dirko::parseString(const std::string &str)
 {
   Queue< std::string > ret;
   size_t start = 0;

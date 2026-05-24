@@ -7,7 +7,7 @@
 namespace dirko
 {
   Queue< Queue< std::string > > input(std::istream &is);
-  Queue< std::string > parseString(std::string);
+  Queue< std::string > parseString(const std::string &);
 }
 
 #endif
