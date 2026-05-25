@@ -10,6 +10,7 @@ namespace dirko
   {
     WavFile track_;
     double duration_;
+    Track() = default;
     Track(WavFile file);
   };
   void PlayWav(dirko::WavFile &wav, double dur);
