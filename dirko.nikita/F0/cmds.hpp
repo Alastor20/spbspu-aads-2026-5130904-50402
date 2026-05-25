@@ -1,17 +1,18 @@
 #ifndef CMDS_HPP
 #define CMDS_HPP
 #include <iosfwd>
-#include "playlist.hpp"
+#include "player.hpp"
 namespace dirko
 {
+  using cmd_t = void (*)(std::istream &, std::ostream &, playlists_t &);
   void play(std::istream &, std::ostream &, playlists_t &);
-  void next(std::istream &, std::ostream &, playlists_t &);
-  void prev(std::istream &, std::ostream &, playlists_t &);
+  // void next(std::istream &, std::ostream &, playlists_t &);
+  // void prev(std::istream &, std::ostream &, playlists_t &);
   void add(std::istream &, std::ostream &, playlists_t &);
   void remove(std::istream &, std::ostream &, playlists_t &);
   void rename(std::istream &, std::ostream &, playlists_t &);
-  void loop(std::istream &, std::ostream &, playlists_t &);
-  void random(std::istream &, std::ostream &, playlists_t &);
+  // void loop(std::istream &, std::ostream &, playlists_t &);
+  // void random(std::istream &, std::ostream &, playlists_t &);
   void list(std::istream &, std::ostream &, playlists_t &);
   void playlist_add(std::istream &, std::ostream &, playlists_t &);
   void playlist_remove(std::istream &, std::ostream &, playlists_t &);
@@ -20,7 +21,7 @@ namespace dirko
   void playlist_remove_track(std::istream &, std::ostream &, playlists_t &);
   void playlist_list(std::istream &, std::ostream &, playlists_t &);
   void playlist_merge(std::istream &, std::ostream &, playlists_t &);
-  void playlist_select(std::istream &, std::ostream &, playlists_t &);
+  // void playlist_select(std::istream &, std::ostream &, playlists_t &);
   void playlist_diff(std::istream &, std::ostream &, playlists_t &);
 }
 #endif
