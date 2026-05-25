@@ -156,8 +156,12 @@ void dirko::playlist_merge(std::istream &in, std::ostream &, playlists_t &db, pl
   }
   db.add(listRes, newList);
 }
-// void dirko::playlist_select(std::istream &, std::ostream &, playlists_t &db,playlist_iter&,playlists_iter&)
-// {}
+void dirko::playlist_select(std::istream &in, std::ostream &, playlists_t &db, playlist_iter &tr, playlists_iter &pl)
+{
+  std::string name;
+  in >> name;
+  pl = db.getIter(name);
+}
 void dirko::playlist_diff(std::istream &in, std::ostream &, playlists_t &db, playlist_iter &, playlists_iter &)
 {
   std::string list1, list2, listRes;
