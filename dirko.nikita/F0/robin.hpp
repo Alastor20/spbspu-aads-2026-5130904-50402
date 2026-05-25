@@ -26,6 +26,7 @@ namespace dirko
   class RobinTable
   {
   public:
+    RobinTable();
     explicit RobinTable(size_t slots, float load);
     RobinTable(std::initializer_list< std::pair< Key, Value > > il);
 
@@ -105,6 +106,11 @@ dirko::RobinNode< Key, Value >::RobinNode():
   val_(),
   psl_(0),
   notEmpty_(false)
+{}
+
+template< class Key, class Value, class Hash, class Equal >
+dirko::RobinTable< Key, Value, Hash, Equal >::RobinTable():
+  RobinTable(16, .7)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
@@ -359,7 +365,7 @@ bool dirko::RTIter< Key, Value, Hash, Equal >::operator==(const RTIter< Key, Val
   if (id_ >= data_->getSize() && other.id_ >= other.data_->getSize()) {
     return true;
   }
-  return (*data_)[id_].val_ == (*other.data_)[other.id_].val_ && other.id_ == id_;
+  return data_ == other.data_ && other.id_ == id_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -427,7 +433,7 @@ bool dirko::RTCIter< Key, Value, Hash, Equal >::operator==(
   if (id_ >= data_->getSize() && other.id_ >= other.data_->getSize()) {
     return true;
   }
-  return (*data_)[id_].val_ == (*other.data_)[other.id_].val_ && other.id_ == id_;
+  return data_ == other.data_ && other.id_ == id_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
