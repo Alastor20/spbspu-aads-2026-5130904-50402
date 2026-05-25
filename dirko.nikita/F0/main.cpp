@@ -14,6 +14,7 @@ int main()
   cmds.add("add", dirko::add);
   cmds.add("remove", dirko::remove);
   cmds.add("rename", dirko::rename);
+  cmds.add("list", dirko::list);
   cmds.add("playlist_add", dirko::playlist_add);
   cmds.add("playlist_remove", dirko::playlist_remove);
   cmds.add("playlist_rename", dirko::playlist_rename);
@@ -21,6 +22,7 @@ int main()
   cmds.add("playlist_remove_track", dirko::playlist_remove_track);
   cmds.add("playlist_list", dirko::playlist_list);
   cmds.add("playlist_merge", dirko::playlist_merge);
+  cmds.add("playlist_diff", dirko::playlist_diff);
 
   std::string cmd;
   while (!std::cin.eof()) {

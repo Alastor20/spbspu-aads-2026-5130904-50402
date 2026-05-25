@@ -15,7 +15,9 @@ namespace dirko
   };
   void PlayWav(dirko::WavFile &wav, double dur);
   using playlist_t = RobinTable< std::string, Track >;
+  using playlist_iter = RTIter< std::string, Track >;
   using playlists_t = RobinTable< std::string, playlist_t >;
+  using playlists_iter = RTIter< std::string, playlist_t >;
   using save_t = RobinTable< std::string, std::string >;
 }
 #endif
