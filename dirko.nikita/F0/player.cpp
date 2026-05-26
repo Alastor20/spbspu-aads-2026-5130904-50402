@@ -1,5 +1,4 @@
 #include "player.hpp"
-#include <filesystem>
 #include <fstream>
 #include <ostream>
 #include <string>
@@ -58,7 +57,7 @@ void dirko::PlayWav(dirko::WavFile &wav, double dur)
 void dirko::save(const save_t &saver)
 {
   std::ofstream file("db.save");
-  for (const std::pair< std::string, std::filesystem::path > &v : saver) {
+  for (const std::pair< std::string, boost::filesystem::path > &v : saver) {
     file << v.first << ';' << v.second << ';';
   }
 }
@@ -67,12 +66,12 @@ void dirko::load(save_t &saver, std::ostream &out)
 {
   std::ifstream file("db.save");
   if (!file.is_open()) {
-    out << "No save file provided";
+    out << "No save file provided\n";
     return;
   }
   std::string name, path;
   while (std::getline(file, name, ';')) {
     std::getline(file, path, ';');
-    saver.add(name, std::filesystem::path(path));
+    saver.add(name, boost::filesystem::path(path));
   }
 }

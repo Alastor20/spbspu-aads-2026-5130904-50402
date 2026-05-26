@@ -94,7 +94,7 @@ namespace dirko
   {
   public:
     RTCIter();
-    RTCIter(Vector< RobinNode< Key, Value > > *, size_t);
+    RTCIter(const Vector< RobinNode< Key, Value > > *, size_t);
 
     RTCIter &operator++();
     RTCIter operator++(int);
@@ -102,10 +102,10 @@ namespace dirko
     RTCIter operator--(int);
     bool operator==(const RTCIter &other) const noexcept;
     bool operator!=(const RTCIter &other) const noexcept;
-    std::pair< Key, Value > &operator*() const noexcept;
+    const std::pair< Key, Value > &operator*() const noexcept;
 
   private:
-    Vector< RobinNode< Key, Value > > *data_;
+    const Vector< RobinNode< Key, Value > > *data_;
     size_t id_;
     void next();
     void prev();
@@ -209,12 +209,16 @@ dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, E
 template< class Key, class Value, class Hash, class Equal >
 dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::getIter(const Key &key)
 {
-  std::pair< Key, Value > par = {key, get(key)};
-  VIter< std::pair< Key, Value > > val = std::find(data_.begin(), data_.end(), par);
+  VIter< RobinNode< Key, Value > > val = data_.begin();
+  for (; val != data_.end(); ++val) {
+    if ((*val).val_.first == key) {
+      break;
+    }
+  }
   if (val == data_.end()) {
     throw std::invalid_argument("no suck key");
   }
-  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), val.pos_);
+  return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), val.getID());
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -463,7 +467,7 @@ dirko::RTCIter< Key, Value, Hash, Equal >::RTCIter():
   id_(0)
 {}
 template< class Key, class Value, class Hash, class Equal >
-dirko::RTCIter< Key, Value, Hash, Equal >::RTCIter(Vector< RobinNode< Key, Value > > *data, size_t id):
+dirko::RTCIter< Key, Value, Hash, Equal >::RTCIter(const Vector< RobinNode< Key, Value > > *data, size_t id):
   data_(data),
   id_(id)
 {
@@ -493,7 +497,7 @@ bool dirko::RTCIter< Key, Value, Hash, Equal >::operator!=(
   return !(*this == other);
 }
 template< class Key, class Value, class Hash, class Equal >
-std::pair< Key, Value > &dirko::RTCIter< Key, Value, Hash, Equal >::operator*() const noexcept
+const std::pair< Key, Value > &dirko::RTCIter< Key, Value, Hash, Equal >::operator*() const noexcept
 {
   return (*data_)[id_].val_;
 }

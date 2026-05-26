@@ -24,6 +24,8 @@ namespace dirko
     VIter< T > operator-(size_t i) noexcept;
     T &operator*();
 
+    size_t getID();
+
   private:
     Vector< T > &v_;
     size_t pos_;
@@ -41,6 +43,8 @@ namespace dirko
     VCIter< T > operator+(size_t i) noexcept;
     VCIter< T > operator-(size_t i) noexcept;
     const T &operator*();
+
+    size_t getID() const;
 
   private:
     const Vector< T > &v_;
@@ -404,6 +408,18 @@ template< class T >
 T &dirko::VIter< T >::operator*()
 {
   return v_.at(pos_);
+}
+
+template< class T >
+size_t dirko::VIter< T >::getID()
+{
+  return pos_;
+}
+
+template< class T >
+size_t dirko::VCIter< T >::getID() const
+{
+  return pos_;
 }
 
 template< class T >

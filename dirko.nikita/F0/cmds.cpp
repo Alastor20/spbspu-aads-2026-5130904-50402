@@ -1,12 +1,15 @@
 #include "cmds.hpp"
 #include <cstddef>
-#include <filesystem>
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <boost/filesystem/operations.hpp>
 #include "decoder.hpp"
+#include "player.hpp"
 
-void dirko::play(std::istream &in, std::ostream &out, playlists_t &db, pl_iter &tr, pls_iter &pl, save_t &)
+using dirko::save_t;
+
+void dirko::play(std::istream &in, std::ostream &out, playlists_t &, pl_iter &tr, pls_iter &pl, save_t &)
 {
   std::string name;
   double dur;
@@ -18,7 +21,7 @@ void dirko::play(std::istream &in, std::ostream &out, playlists_t &db, pl_iter &
   }
   PlayWav((*tr).second.track_, dur);
 }
-void dirko::next(std::istream &, std::ostream &, playlists_t &db, pl_iter &tr, pls_iter &pl, save_t &)
+void dirko::next(std::istream &, std::ostream &, playlists_t &, pl_iter &tr, pls_iter &pl, save_t &)
 {
   ++tr;
   if (tr == (*pl).second.end()) {
@@ -26,7 +29,7 @@ void dirko::next(std::istream &, std::ostream &, playlists_t &db, pl_iter &tr, p
   }
   PlayWav((*tr).second.track_, (*tr).second.duration_);
 }
-void dirko::prev(std::istream &, std::ostream &, playlists_t &db, pl_iter &tr, pls_iter &pl, save_t &)
+void dirko::prev(std::istream &, std::ostream &, playlists_t &, pl_iter &tr, pls_iter &pl, save_t &)
 {
   if (tr == (*pl).second.begin()) {
     tr = (*pl).second.end();
@@ -36,14 +39,14 @@ void dirko::prev(std::istream &, std::ostream &, playlists_t &db, pl_iter &tr, p
 }
 void dirko::add(std::istream &in, std::ostream &, playlists_t &db, pl_iter &, pls_iter &, save_t &saver)
 {
-  std::filesystem::path path;
+  boost::filesystem::path path;
   std::string name;
   in >> path >> name;
   WavFile wav;
-  Load(path, wav);
+  Load(path.string(), wav);
   Track track(wav);
   db.get("DEFAULT").add(name, track);
-  saver.add(name, std::filesystem::absolute(path));
+  saver.add(name, boost::filesystem::absolute(path));
 }
 void dirko::remove(std::istream &in, std::ostream &, playlists_t &db, pl_iter &, pls_iter &, save_t &saver)
 {
@@ -73,7 +76,7 @@ void dirko::rename(std::istream &in, std::ostream &, playlists_t &db, pl_iter &,
   }
   saver.changeKey(from, to);
 }
-void dirko::loop(std::istream &in, std::ostream &, playlists_t &db, pl_iter &tr, pls_iter &pl, save_t &)
+void dirko::loop(std::istream &in, std::ostream &, playlists_t &, pl_iter &tr, pls_iter &, save_t &)
 {
   size_t times;
   in >> times;
@@ -81,18 +84,18 @@ void dirko::loop(std::istream &in, std::ostream &, playlists_t &db, pl_iter &tr,
     PlayWav((*tr).second.track_, (*tr).second.duration_);
   }
 }
-void dirko::random(std::istream &, std::ostream &, playlists_t &db, pl_iter &tr, pls_iter &pl, save_t &)
+void dirko::random(std::istream &, std::ostream &, playlists_t &, pl_iter &tr, pls_iter &pl, save_t &)
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> distrib(1, (*pl).second.size());
+  std::uniform_int_distribution< size_t > distrib(1, (*pl).second.size());
   tr = (*pl).second.begin();
   for (size_t i = 0; i < distrib(gen); ++i) {
     ++pl;
   }
   PlayWav((*tr).second.track_, (*tr).second.duration_);
 }
-void dirko::list(std::istream &, std::ostream &out, playlists_t &db, pl_iter &, pls_iter &pl, save_t &)
+void dirko::list(std::istream &, std::ostream &out, playlists_t &, pl_iter &, pls_iter &pl, save_t &)
 {
   for (const std::pair< std::string, Track > &v : (*pl).second) {
     out << v.first << '\n';
@@ -128,7 +131,7 @@ void dirko::playlist_remove_track(std::istream &in, std::ostream &, playlists_t 
   in >> playlist >> track;
   db.get(playlist).drop(track);
 }
-void dirko::playlist_list(std::istream &in, std::ostream &out, playlists_t &db, pl_iter &, pls_iter &pl, save_t &)
+void dirko::playlist_list(std::istream &in, std::ostream &out, playlists_t &, pl_iter &, pls_iter &pl, save_t &)
 {
   std::string name;
   in >> name;
@@ -154,7 +157,7 @@ void dirko::playlist_merge(std::istream &in, std::ostream &, playlists_t &db, pl
   }
   db.add(listRes, newList);
 }
-void dirko::playlist_select(std::istream &in, std::ostream &, playlists_t &db, pl_iter &tr, pls_iter &pl, save_t &)
+void dirko::playlist_select(std::istream &in, std::ostream &, playlists_t &db, pl_iter &, pls_iter &pl, save_t &)
 {
   std::string name;
   in >> name;
