@@ -1,4 +1,9 @@
 #include "player.hpp"
+#include <filesystem>
+#include <fstream>
+#include <ostream>
+#include <string>
+#include <utility>
 #include "decoder.hpp"
 
 dirko::Track::Track(dirko::WavFile wav):
@@ -48,4 +53,26 @@ void dirko::PlayWav(dirko::WavFile &wav, double dur)
   SDL_Delay(static_cast< Uint32 >(dur * 1000));
   SDL_CloseAudioDevice(device);
   SDL_Quit();
+}
+
+void dirko::save(const save_t &saver)
+{
+  std::ofstream file("db.save");
+  for (const std::pair< std::string, std::filesystem::path > &v : saver) {
+    file << v.first << ';' << v.second << ';';
+  }
+}
+
+void dirko::load(save_t &saver, std::ostream &out)
+{
+  std::ifstream file("db.save");
+  if (!file.is_open()) {
+    out << "No save file provided";
+    return;
+  }
+  std::string name, path;
+  while (std::getline(file, name, ';')) {
+    std::getline(file, path, ';');
+    saver.add(name, std::filesystem::path(path));
+  }
 }

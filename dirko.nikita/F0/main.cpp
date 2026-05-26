@@ -11,10 +11,14 @@ int main()
   db.add("DEFAULT", dirko::playlist_t());
   dirko::RobinTable< std::string, dirko::cmd_t > cmds(20, .7);
   cmds.add("play", dirko::play);
+  cmds.add("next", dirko::next);
+  cmds.add("prev", dirko::prev);
   cmds.add("add", dirko::add);
   cmds.add("remove", dirko::remove);
   cmds.add("rename", dirko::rename);
   cmds.add("list", dirko::list);
+  cmds.add("loop", dirko::loop);
+  cmds.add("random", dirko::random);
   cmds.add("playlist_add", dirko::playlist_add);
   cmds.add("playlist_remove", dirko::playlist_remove);
   cmds.add("playlist_rename", dirko::playlist_rename);
@@ -22,7 +26,14 @@ int main()
   cmds.add("playlist_remove_track", dirko::playlist_remove_track);
   cmds.add("playlist_list", dirko::playlist_list);
   cmds.add("playlist_merge", dirko::playlist_merge);
+  cmds.add("playlist_select", dirko::playlist_select);
   cmds.add("playlist_diff", dirko::playlist_diff);
+
+  dirko::pl_iter track = db.get("DEFAULT").end();
+  dirko::pls_iter playlist = db.getIter("DEFAULT");
+  dirko::save_t saver;
+
+  dirko::load(saver, std::cout);
 
   std::string cmd;
   while (!std::cin.eof()) {
@@ -31,10 +42,11 @@ int main()
       if (std::cin.fail()) {
         std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
       }
-      cmds.get(cmd)(std::cin, std::cout, db);
+      cmds.get(cmd)(std::cin, std::cout, db, track, playlist, saver);
     } catch (const std::exception &e) {
       std::cout << '<' << e.what() << ">\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
+  dirko::save(saver);
 }
