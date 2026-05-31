@@ -16,6 +16,7 @@ void dirko::play(std::istream &in, std::ostream &out, playlists_t &, pl_iter &tr
   tr = (*pl).second.getIter(name);
   out << "duration: " << (*tr).second.duration_ << '\n';
   double dur;
+  in >> dur;
   if (dur > (*tr).second.duration_) {
     out << "<playing until end of track>\n";
     dur = (*tr).second.duration_;

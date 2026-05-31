@@ -34,7 +34,7 @@ int main()
   dirko::pl_iter track = (*playlist).second.begin();
   dirko::save_t saver(6, .7);
 
-  dirko::load(saver, std::cout);
+  dirko::load(saver, std::cout, db.get("DEFAULT"));
 
   std::string cmd;
   while (!std::cin.eof()) {

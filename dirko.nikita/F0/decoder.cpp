@@ -8,7 +8,7 @@ void dirko::Load(const std::string &filename, WavFile &outWav)
   std::ifstream file(filename, std::ios::binary);
 
   if (!file.is_open()) {
-    throw std::runtime_error("Failed to open file");
+    throw std::invalid_argument("Failed to open file");
   }
 
   char riff[4];

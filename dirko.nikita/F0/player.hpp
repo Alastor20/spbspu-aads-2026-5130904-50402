@@ -23,6 +23,6 @@ namespace dirko
 
   void PlayWav(dirko::WavFile &wav, double dur);
   void save(const save_t &saver);
-  void load(save_t &saver, std::ostream &out);
+  void load(save_t &saver, std::ostream &out, playlist_t &playlist);
 }
 #endif

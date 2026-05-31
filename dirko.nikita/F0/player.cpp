@@ -1,6 +1,7 @@
 #include "player.hpp"
 #include <fstream>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include "decoder.hpp"
@@ -62,7 +63,7 @@ void dirko::save(const save_t &saver)
   }
 }
 
-void dirko::load(save_t &saver, std::ostream &out)
+void dirko::load(save_t &saver, std::ostream &out, playlist_t &playlist)
 {
   std::ifstream file("db.save");
   if (!file.is_open()) {
@@ -70,8 +71,16 @@ void dirko::load(save_t &saver, std::ostream &out)
     return;
   }
   std::string name, path;
+  WavFile buffer;
   while (std::getline(file, name, ';')) {
     std::getline(file, path, ';');
+    try {
+      Load(path, buffer);
+    } catch (const std::invalid_argument &) {
+      out << "failed to add " << name << '\n';
+      continue;
+    }
+    playlist.add(name, Track(buffer));
     saver.add(name, boost::filesystem::path(path));
   }
 }
