@@ -53,7 +53,7 @@ void dirko::remove(std::istream &in, std::ostream &, playlists_t &db, pl_iter &,
   std::string name;
   in >> name;
   if (!db.get("DEFAULT").has(name)) {
-    throw std::invalid_argument("no suck track");
+    throw std::invalid_argument("no such track");
   }
   for (std::pair< std::string, playlist_t > &v : db) {
     if (v.second.has(name)) {
@@ -67,7 +67,7 @@ void dirko::rename(std::istream &in, std::ostream &, playlists_t &db, pl_iter &,
   std::string from, to;
   in >> from >> to;
   if (!db.get("DEFAULT").has(from)) {
-    throw std::invalid_argument("no suck track");
+    throw std::invalid_argument("no such track");
   }
   for (std::pair< std::string, playlist_t > &v : db) {
     if (v.second.has(from)) {
