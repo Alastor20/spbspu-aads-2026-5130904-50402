@@ -37,9 +37,7 @@ int main()
   dirko::load(saver, std::cout, db.get("DEFAULT"));
 
   std::string cmd;
-  while (!std::cin.eof()) {
-    std::cout << (*playlist).first << "> ";
-    std::cin >> cmd;
+  while (std::cin >> cmd) {
     try {
       if (std::cin.fail()) {
         std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
