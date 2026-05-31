@@ -38,10 +38,12 @@ int main()
 
   std::string cmd;
   while (!std::cin.eof()) {
+    std::cout << (*playlist).first << "> ";
     std::cin >> cmd;
     try {
       if (std::cin.fail()) {
         std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
       cmds.get(cmd)(std::cin, std::cout, db, track, playlist, saver);
     } catch (const std::exception &e) {

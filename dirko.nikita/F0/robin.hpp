@@ -211,7 +211,7 @@ dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Eq
 {
   VIter< RobinNode< Key, Value > > val = data_.begin();
   for (; val != data_.end(); ++val) {
-    if ((*val).val_.first == key) {
+    if ((*val).val_.first == key && (*val).notEmpty_) {
       break;
     }
   }
@@ -440,9 +440,6 @@ void dirko::RTIter< Key, Value, Hash, Equal >::next()
   while (id_ < data_->getSize() && !(*data_)[id_].notEmpty_) {
     ++id_;
   }
-  if (id_ >= data_->getSize()) {
-    data_ = nullptr;
-  }
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -450,9 +447,6 @@ void dirko::RTIter< Key, Value, Hash, Equal >::prev()
 {
   while (id_ > 1 && !(*data_)[id_].notEmpty_) {
     --id_;
-  }
-  if (id_ < 1 && !(*data_)[id_].notEmpty_) {
-    data_ = nullptr;
   }
 }
 template< class Key, class Value, class Hash, class Equal >
@@ -531,9 +525,6 @@ void dirko::RTCIter< Key, Value, Hash, Equal >::next()
   while (id_ < data_->getSize() && !(*data_)[id_].notEmpty_) {
     ++id_;
   }
-  if (id_ >= data_->getSize()) {
-    data_ = nullptr;
-  }
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -541,9 +532,6 @@ void dirko::RTCIter< Key, Value, Hash, Equal >::prev()
 {
   while (id_ > 1 && !(*data_)[id_].notEmpty_) {
     --id_;
-  }
-  if (id_ < 1 && !(*data_)[id_].notEmpty_) {
-    data_ = nullptr;
   }
 }
 #endif
