@@ -19,15 +19,16 @@ int main()
   cmds.add("list", dirko::list);
   cmds.add("loop", dirko::loop);
   cmds.add("random", dirko::random);
-  cmds.add("playlist_add", dirko::playlist_add);
-  cmds.add("playlist_remove", dirko::playlist_remove);
-  cmds.add("playlist_rename", dirko::playlist_rename);
-  cmds.add("playlist_add_track", dirko::playlist_add_track);
-  cmds.add("playlist_remove_track", dirko::playlist_remove_track);
-  cmds.add("playlist_list", dirko::playlist_list);
-  cmds.add("playlist_merge", dirko::playlist_merge);
-  cmds.add("playlist_select", dirko::playlist_select);
-  cmds.add("playlist_diff", dirko::playlist_diff);
+  cmds.add("playlist-add", dirko::playlist_add);
+  cmds.add("playlist-remove", dirko::playlist_remove);
+  cmds.add("playlist-rename", dirko::playlist_rename);
+  cmds.add("playlist-add-track", dirko::playlist_add_track);
+  cmds.add("playlist-remove-track", dirko::playlist_remove_track);
+  cmds.add("playlist-get", dirko::playlist_get);
+  cmds.add("playlist-list", dirko::playlist_list);
+  cmds.add("playlist-merge", dirko::playlist_merge);
+  cmds.add("playlist-select", dirko::playlist_select);
+  cmds.add("playlist-diff", dirko::playlist_diff);
 
   dirko::pls_iter playlist = db.begin();
   dirko::pl_iter track = (*playlist).second.begin();

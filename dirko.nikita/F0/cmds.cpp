@@ -12,9 +12,10 @@ using dirko::save_t;
 void dirko::play(std::istream &in, std::ostream &out, playlists_t &, pl_iter &tr, pls_iter &pl, save_t &)
 {
   std::string name;
-  double dur;
-  in >> name >> dur;
+  in >> name;
   tr = (*pl).second.getIter(name);
+  out << "duration: " << (*tr).second.duration_ << '\n';
+  double dur;
   if (dur > (*tr).second.duration_) {
     out << "<playing until end of track>\n";
     dur = (*tr).second.duration_;
@@ -105,7 +106,7 @@ void dirko::playlist_add(std::istream &in, std::ostream &, playlists_t &db, pl_i
 {
   std::string name;
   in >> name;
-  db.add(name, playlist_t());
+  db.add(name, playlist_t(5, .7));
 }
 void dirko::playlist_remove(std::istream &in, std::ostream &, playlists_t &db, pl_iter &, pls_iter &, save_t &)
 {
@@ -131,11 +132,17 @@ void dirko::playlist_remove_track(std::istream &in, std::ostream &, playlists_t 
   in >> playlist >> track;
   db.get(playlist).drop(track);
 }
-void dirko::playlist_list(std::istream &in, std::ostream &out, playlists_t &, pl_iter &, pls_iter &pl, save_t &)
+void dirko::playlist_get(std::istream &in, std::ostream &out, playlists_t &, pl_iter &, pls_iter &pl, save_t &)
 {
   std::string name;
   in >> name;
   for (const std::pair< std::string, Track > &v : (*pl).second) {
+    out << v.first << '\n';
+  }
+}
+void dirko::playlist_list(std::istream &, std::ostream &out, playlists_t &db, pl_iter &, pls_iter &, save_t &)
+{
+  for (const std::pair< std::string, playlist_t > &v : db) {
     out << v.first << '\n';
   }
 }

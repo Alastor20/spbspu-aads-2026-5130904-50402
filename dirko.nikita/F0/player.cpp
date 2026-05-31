@@ -58,7 +58,7 @@ void dirko::save(const save_t &saver)
 {
   std::ofstream file("db.save");
   for (const std::pair< std::string, boost::filesystem::path > &v : saver) {
-    file << v.first << ';' << v.second << ';';
+    file << v.first << ';' << v.second.string() << ';';
   }
 }
 
