@@ -2,8 +2,8 @@
 #define DECODER_HPP
 
 #include <string>
-#include <SDL2/SDL.h>
 #include "../common/Vector.hpp"
+#include "sdl_header.hpp"
 
 namespace dirko
 {

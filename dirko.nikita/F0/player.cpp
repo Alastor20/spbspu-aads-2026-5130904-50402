@@ -3,7 +3,6 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
-#include <utility>
 #include "decoder.hpp"
 
 dirko::Track::Track(dirko::WavFile wav):
