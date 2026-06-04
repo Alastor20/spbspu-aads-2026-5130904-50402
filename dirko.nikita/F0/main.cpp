@@ -5,6 +5,8 @@
 #include "player.hpp"
 #include "robin.hpp"
 
+#define USE_FAKE_SDL
+
 int main()
 {
   dirko::playlists_t db(5, .7);

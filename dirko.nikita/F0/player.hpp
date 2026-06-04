@@ -5,6 +5,7 @@
 #include "decoder.hpp"
 #include "robin.hpp"
 
+#define USE_FAKE_SDL
 namespace dirko
 {
   struct Track
