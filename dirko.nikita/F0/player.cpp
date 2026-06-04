@@ -63,7 +63,7 @@ void dirko::save(const save_t &saver)
   }
 }
 
-void dirko::load(save_t &saver, std::ostream &out, playlist_t &playlist)
+void dirko::load(save_t &saver, std::ostream &out, playlists_t &playlists)
 {
   std::ifstream file("db.save");
   if (!file.is_open()) {
@@ -72,6 +72,7 @@ void dirko::load(save_t &saver, std::ostream &out, playlist_t &playlist)
   }
   std::string name, path;
   WavFile buffer;
+  playlist_t &defaultPl = playlists.get("All");
   while (std::getline(file, name, ';')) {
     std::getline(file, path, ';');
     try {
@@ -80,7 +81,7 @@ void dirko::load(save_t &saver, std::ostream &out, playlist_t &playlist)
       out << "failed to add " << name << '\n';
       continue;
     }
-    playlist.add(name, Track(buffer));
+    defaultPl.add(name, Track(buffer));
     saver.add(name, boost::filesystem::path(path));
   }
 }

@@ -8,7 +8,7 @@
 int main()
 {
   dirko::playlists_t db(5, .7);
-  db.add("DEFAULT", dirko::playlist_t(5, .7));
+  db.add("All", dirko::playlist_t(5, .7));
   dirko::RobinTable< std::string, dirko::cmd_t > cmds(20, .7);
   cmds.add("play", dirko::play);
   cmds.add("next", dirko::next);
@@ -30,11 +30,11 @@ int main()
   cmds.add("playlist-select", dirko::playlist_select);
   cmds.add("playlist-diff", dirko::playlist_diff);
 
-  dirko::pls_iter playlist = db.begin();
-  dirko::pl_iter track = (*playlist).second.begin();
+  dirko::pls_iter_t playlist = db.begin();
+  dirko::pl_iter_t track = (*playlist).second.begin();
   dirko::save_t saver(6, .7);
 
-  dirko::load(saver, std::cout, db.get("DEFAULT"));
+  dirko::load(saver, std::cout, db);
 
   std::string cmd;
   while (std::cin >> cmd) {
