@@ -14,7 +14,7 @@ void dirko::cmdPrint(std::istream &in, std::ostream &out, dirko::Datasets &datas
       out << "<EMPTY>" << '\n';
     } else {
       out << name;
-      for (const std::pair< const int, std::string > &v : ds) {
+      for (const std::pair< int, std::string > &v : ds) {
         out << ' ' << v.first << ' ' << v.second;
       }
       out << '\n';
@@ -33,7 +33,7 @@ void dirko::cmdComplement(std::istream &in, std::ostream &, dirko::Datasets &dat
   const dirko::Dataset &ds1 = datasets.get(name1);
   const dirko::Dataset &ds2 = datasets.get(name2);
   dirko::Dataset new_ds;
-  for (const std::pair< const int, std::string > &v : ds1) {
+  for (const std::pair< int, std::string > &v : ds1) {
     try {
       ds2.get(v.first);
     } catch (const std::out_of_range &) {
@@ -52,7 +52,7 @@ void dirko::cmdIntersect(std::istream &in, std::ostream &, dirko::Datasets &data
   const dirko::Dataset &ds1 = datasets.get(name1);
   const dirko::Dataset &ds2 = datasets.get(name2);
   dirko::Dataset new_ds;
-  for (const std::pair< const int, std::string > &v : ds1) {
+  for (const std::pair< int, std::string > &v : ds1) {
     try {
       ds2.get(v.first);
       new_ds.push(v.first, v.second);
@@ -71,10 +71,10 @@ void dirko::cmdUnion(std::istream &in, std::ostream &, dirko::Datasets &datasets
   const dirko::Dataset &ds1 = datasets.get(name1);
   const dirko::Dataset &ds2 = datasets.get(name2);
   dirko::Dataset new_ds;
-  for (const std::pair< const int, std::string > &v : ds1) {
+  for (const std::pair< int, std::string > &v : ds1) {
     new_ds.push(v.first, v.second);
   }
-  for (const std::pair< const int, std::string > &v : ds2) {
+  for (const std::pair< int, std::string > &v : ds2) {
     try {
       new_ds.get(v.first);
     } catch (const std::out_of_range &) {

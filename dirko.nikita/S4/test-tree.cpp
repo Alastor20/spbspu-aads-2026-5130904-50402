@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(test_iterator_traversal)
   tree.push(2, "two");
   tree.push(4, "four");
 
-  std::vector< std::pair< const int, std::string > > result;
+  std::vector< std::pair< int, std::string > > result;
   for (auto it = tree.begin(); it != tree.end(); ++it) {
     result.push_back(*it);
   }
