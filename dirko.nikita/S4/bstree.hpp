@@ -26,7 +26,7 @@ namespace dirko
   {
   public:
     explicit BSTIterator(TreeNode< Key, Value > *node);
-    std::pair< const Key, Value > operator*();
+    std::pair< const Key, Value > &operator*();
     BSTIterator &operator++();
     BSTIterator &operator--();
     BSTIterator operator++(int);
@@ -45,7 +45,7 @@ namespace dirko
   {
   public:
     explicit BSTConstIterator(TreeNode< Key, Value > *node);
-    std::pair< const Key, Value > operator*() const;
+    std::pair< const Key, Value > &operator*() const;
     BSTConstIterator &operator++();
     BSTConstIterator &operator--();
     BSTConstIterator operator++(int);
@@ -184,7 +184,7 @@ dirko::BSTIterator< Key, Value >::BSTIterator(TreeNode< Key, Value > *node):
 {}
 
 template< class Key, class Value >
-std::pair< const Key, Value > dirko::BSTIterator< Key, Value >::operator*()
+std::pair< const Key, Value > &dirko::BSTIterator< Key, Value >::operator*()
 {
   return {curr_->key_, curr_->value_};
 }
@@ -264,7 +264,7 @@ dirko::BSTConstIterator< Key, Value >::BSTConstIterator(TreeNode< Key, Value > *
 {}
 
 template< class Key, class Value >
-std::pair< const Key, Value > dirko::BSTConstIterator< Key, Value >::operator*() const
+std::pair< const Key, Value > &dirko::BSTConstIterator< Key, Value >::operator*() const
 {
   return {curr_->key_, curr_->value_};
 }
