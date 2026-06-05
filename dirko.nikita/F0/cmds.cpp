@@ -3,7 +3,6 @@
 #include <random>
 #include <stdexcept>
 #include <string>
-#include <boost/filesystem/operations.hpp>
 #include "decoder.hpp"
 #include "player.hpp"
 
@@ -58,14 +57,14 @@ void dirko::prev(std::istream &in, std::ostream &out, playlists_t &, pl_iter_t &
 }
 void dirko::add(std::istream &in, std::ostream &, playlists_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
 {
-  boost::filesystem::path path;
+  std::string path;
   std::string name;
   in >> path >> name;
   WavFile wav;
-  Load(path.string(), wav);
+  Load(path, wav);
   Track track(wav);
   db.get("All").add(name, track);
-  saver.add(name, boost::filesystem::absolute(path));
+  saver.add(name, path);
 }
 void dirko::remove(std::istream &in, std::ostream &, playlists_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
 {

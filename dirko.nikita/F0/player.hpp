@@ -1,7 +1,6 @@
 #ifndef PLAYER_TYPES_HPP
 #define PLAYER_TYPES_HPP
 #include <string>
-#include <boost/filesystem.hpp>
 #include "decoder.hpp"
 #include "robin.hpp"
 
@@ -20,7 +19,7 @@ namespace dirko
   using pl_iter_t = RTIter< std::string, Track >;
   using playlists_t = RobinTable< std::string, playlist_t >;
   using pls_iter_t = RTIter< std::string, playlist_t >;
-  using save_t = RobinTable< std::string, boost::filesystem::path >;
+  using save_t = RobinTable< std::string, std::string >;
 
   void PlayWav(dirko::WavFile &wav, double dur);
   void save(const save_t &saver);

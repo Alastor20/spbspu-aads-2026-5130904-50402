@@ -57,8 +57,8 @@ void dirko::PlayWav(dirko::WavFile &wav, double dur)
 void dirko::save(const save_t &saver)
 {
   std::ofstream file("db.save");
-  for (const std::pair< std::string, boost::filesystem::path > &v : saver) {
-    file << v.first << ';' << v.second.string() << ';';
+  for (const std::pair< std::string, std::string > &v : saver) {
+    file << v.first << ';' << v.second << ';';
   }
 }
 
@@ -81,6 +81,6 @@ void dirko::load(save_t &saver, std::ostream &out, playlists_t &playlists)
       continue;
     }
     defaultPl.add(name, Track(buffer));
-    saver.add(name, boost::filesystem::path(path));
+    saver.add(name, path);
   }
 }
