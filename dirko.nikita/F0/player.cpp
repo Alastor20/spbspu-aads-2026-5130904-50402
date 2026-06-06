@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include "decoder.hpp"
+#include "fake_sdl.hpp"
 
 dirko::Track::Track(dirko::WavFile wav):
   track_(wav),
@@ -38,9 +39,7 @@ void dirko::PlayWav(dirko::WavFile &wav, double dur)
 
   spec.samples = 4096;
   spec.callback = nullptr;
-
   SDL_AudioDeviceID device = SDL_OpenAudioDevice(nullptr, 0, &spec, nullptr, 0);
-
   if (!device) {
     throw SDL_GetError();
   }
@@ -62,7 +61,7 @@ void dirko::save(const save_t &saver)
   }
 }
 
-void dirko::load(save_t &saver, std::ostream &out, playlists_t &playlists)
+void dirko::load(save_t &saver, std::ostream &out, pls_t &playlists, lib_t &lib)
 {
   std::ifstream file("db.save");
   if (!file.is_open()) {
@@ -71,7 +70,7 @@ void dirko::load(save_t &saver, std::ostream &out, playlists_t &playlists)
   }
   std::string name, path;
   WavFile buffer;
-  playlist_t &defaultPl = playlists.get("All");
+  pl_t &defaultPl = playlists.get("All");
   while (std::getline(file, name, ';')) {
     std::getline(file, path, ';');
     try {
@@ -80,7 +79,8 @@ void dirko::load(save_t &saver, std::ostream &out, playlists_t &playlists)
       out << "failed to add " << name << '\n';
       continue;
     }
-    defaultPl.add(name, Track(buffer));
+    lib.add(name, Track(buffer));
+    defaultPl.add(name, lib.get(name));
     saver.add(name, path);
   }
 }

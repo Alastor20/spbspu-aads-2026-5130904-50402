@@ -1,5 +1,6 @@
-#include "sdl_header.hpp"
+#include "fake_sdl.hpp"
 
+#define USE_FAKE_SDL
 #ifdef USE_FAKE_SDL
 int SDL_Init(int)
 {
