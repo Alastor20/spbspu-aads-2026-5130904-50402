@@ -61,7 +61,7 @@ void dirko::save(const save_t &saver)
   }
 }
 
-void dirko::load(save_t &saver, std::ostream &out, pls_t &playlists, lib_t &lib)
+void dirko::load(save_t &saver, std::ostream &out, pls_t &playlists)
 {
   std::ifstream file("db.save");
   if (!file.is_open()) {
@@ -79,8 +79,7 @@ void dirko::load(save_t &saver, std::ostream &out, pls_t &playlists, lib_t &lib)
       out << "failed to add " << name << '\n';
       continue;
     }
-    lib.add(name, Track(buffer));
-    defaultPl.add(name, lib.get(name));
+    defaultPl.add(name, Track(buffer));
     saver.add(name, path);
   }
 }

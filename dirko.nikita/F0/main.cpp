@@ -9,7 +9,6 @@
 
 int main()
 {
-  dirko::lib_t lib(5, .7);
   dirko::pls_t db(5, .7);
   db.add("All", dirko::pl_t(5, .7));
   dirko::RobinTable< std::string, dirko::cmd_t > cmds(20, .7);
@@ -37,7 +36,7 @@ int main()
   dirko::pl_iter_t track = (*playlist).second.begin();
   dirko::save_t saver(6, .7);
 
-  dirko::load(saver, std::cout, db, lib);
+  dirko::load(saver, std::cout, db);
 
   std::string cmd;
   while (std::cin >> cmd) {
@@ -46,7 +45,7 @@ int main()
         std::cin.clear(std::cin.rdstate() & ~std::ios::failbit);
         std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
-      cmds.get(cmd)(std::cin, std::cout, db, track, playlist, saver, lib);
+      cmds.get(cmd)(std::cin, std::cout, db, track, playlist, saver);
     } catch (const std::exception &e) {
       std::cout << '<' << e.what() << ">\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

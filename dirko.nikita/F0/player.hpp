@@ -15,15 +15,14 @@ namespace dirko
     Track(WavFile file);
   };
 
-  using lib_t = RobinTable< std::string, Track >;
-  using pl_t = RobinTable< std::string, Track & >;
-  using pl_iter_t = RTIter< std::string, Track & >;
+  using pl_t = RobinTable< std::string, Track >;
+  using pl_iter_t = RTIter< std::string, Track >;
   using pls_t = RobinTable< std::string, pl_t >;
   using pls_iter_t = RTIter< std::string, pl_t >;
   using save_t = RobinTable< std::string, std::string >;
 
   void PlayWav(dirko::WavFile &wav, double dur);
   void save(const save_t &saver);
-  void load(save_t &saver, std::ostream &out, pls_t &playlists, lib_t &lib);
+  void load(save_t &saver, std::ostream &out, pls_t &playlists);
 }
 #endif
