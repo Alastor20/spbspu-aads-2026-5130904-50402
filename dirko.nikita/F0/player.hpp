@@ -22,7 +22,7 @@ namespace dirko
   using save_t = RobinTable< std::string, std::string >;
 
   void PlayWav(dirko::WavFile &wav, double dur);
-  void save(const save_t &saver);
+  void save(const save_t &saver, const pls_t &db);
   void load(save_t &saver, std::ostream &out, pls_t &playlists);
 }
 #endif

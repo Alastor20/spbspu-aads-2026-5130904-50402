@@ -3,6 +3,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include "decoder.hpp"
 #include "fake_sdl.hpp"
 
@@ -53,11 +54,23 @@ void dirko::PlayWav(dirko::WavFile &wav, double dur)
   SDL_Quit();
 }
 
-void dirko::save(const save_t &saver)
+void dirko::save(const save_t &saver, const pls_t &db)
 {
   std::ofstream file("db.save");
   for (const std::pair< std::string, std::string > &v : saver) {
     file << v.first << ';' << v.second << ';';
+  }
+  file.close();
+  file.open("playlists.save");
+  for (const std::pair< std::string, pl_t > &playlist : db) {
+    if (playlist.first == "All") {
+      continue;
+    }
+    file << playlist.first;
+    for (const std::pair< std::string, Track > &track : playlist.second) {
+      file << ' ' << track.first;
+    }
+    file << '\n';
   }
 }
 
@@ -81,5 +94,24 @@ void dirko::load(save_t &saver, std::ostream &out, pls_t &playlists)
     }
     defaultPl.add(name, Track(buffer));
     saver.add(name, path);
+  }
+  file.close();
+  file.open("playlists.save");
+  if (!file.is_open()) {
+    out << "No playlists save file provided\n";
+    return;
+  }
+  while (file >> name) {
+    std::string track;
+    pl_t playlist;
+    while (file.peek() != '\n') {
+      file >> track;
+      if (defaultPl.has(track)) {
+        playlist.add(track, defaultPl.get(track));
+      }
+    }
+    if (!playlist.empty()) {
+      playlists.add(name, std::move(playlist));
+    }
   }
 }
