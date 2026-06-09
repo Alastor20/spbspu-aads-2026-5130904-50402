@@ -169,7 +169,7 @@ void dirko::pl_merge(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, p
   std::string list1, list2, listRes;
   in >> list1 >> list2 >> listRes;
   if (db.has(listRes)) {
-    throw std::invalid_argument("playlist woth this name already exitsts");
+    throw std::invalid_argument("playlist with this name already exitsts");
   }
   pl_t newList(10, .7);
   for (const std::pair< std::string, Track > &v : db.get(list1)) {
@@ -194,7 +194,7 @@ void dirko::pl_diff(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pl
   std::string list1, list2, listRes;
   in >> list1 >> list2 >> listRes;
   if (db.has(listRes)) {
-    throw std::invalid_argument("playlist woth this name already exitsts");
+    throw std::invalid_argument("playlist with this name already exitsts");
   }
   pl_t newList(10, .7);
   for (const std::pair< std::string, Track > &v : db.get(list1)) {
