@@ -402,6 +402,7 @@ dirko::BSTree< Key, Value, Compare > &dirko::BSTree< Key, Value, Compare >::oper
 {
   if (this != std::addressof(other)) {
     clear();
+    delete root_;
     root_ = other.root_;
     size_ = other.size_;
     comp_ = std::move(other.comp_);
