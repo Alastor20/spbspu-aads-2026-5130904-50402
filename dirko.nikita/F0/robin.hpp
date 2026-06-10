@@ -16,7 +16,7 @@ namespace dirko
   {
     std::pair< Key, Value > val_;
     size_t psl_;
-    bool notEmpty_;
+    bool occupied_;
     RobinNode();
     void swap(RobinNode &other);
   };
@@ -116,7 +116,7 @@ template< class Key, class Value >
 dirko::RobinNode< Key, Value >::RobinNode():
   val_(),
   psl_(0),
-  notEmpty_(false)
+  occupied_(false)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
@@ -211,7 +211,7 @@ dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Eq
 {
   VIter< RobinNode< Key, Value > > val = data_.begin();
   for (; val != data_.end(); ++val) {
-    if ((*val).val_.first == key && (*val).notEmpty_) {
+    if ((*val).val_.first == key && (*val).occupied_) {
       break;
     }
   }
@@ -244,10 +244,10 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::add(Key k, Value v)
   size_t id = hasher_(k) % slots_;
   size_t psl = 0;
   while (true) {
-    if (!data_[id].notEmpty_) {
+    if (!data_[id].occupied_) {
       data_[id].val_ = {k, v};
       data_[id].psl_ = psl;
-      data_[id].notEmpty_ = true;
+      data_[id].occupied_ = true;
       ++elements_;
       return;
     }
@@ -285,17 +285,17 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::drop(Key k)
   }
   size_t id = hasher_(k) % slots_;
   size_t cycle = id;
-  while (data_[id].notEmpty_) {
+  while (data_[id].occupied_) {
     if (comparator_(k, data_[id].val_.first)) {
       size_t curr = id;
       size_t next = (curr + 1) % slots_;
-      while (data_[next].notEmpty_ && data_[next].psl_ > 0) {
+      while (data_[next].occupied_ && data_[next].psl_ > 0) {
         data_[curr].val_ = std::move(data_[next].val_);
         data_[curr].psl_ = data_[next].psl_ - 1;
         curr = next;
         next = (next + 1) % slots_;
       }
-      data_[curr].notEmpty_ = false;
+      data_[curr].occupied_ = false;
       data_[curr].psl_ = 0;
       --elements_;
       return;
@@ -315,7 +315,7 @@ bool dirko::RobinTable< Key, Value, Hash, Equal >::has(Key k) const noexcept
   }
   size_t id = hasher_(k) % slots_;
   size_t cycle = id;
-  while (data_[id].notEmpty_) {
+  while (data_[id].occupied_) {
     if (comparator_(k, data_[id].val_.first)) {
       return true;
     }
@@ -335,7 +335,7 @@ Value &dirko::RobinTable< Key, Value, Hash, Equal >::get(Key k)
   }
   size_t id = hasher_(k) % slots_;
   size_t cycle = id;
-  while (data_[id].notEmpty_) {
+  while (data_[id].occupied_) {
     if (comparator_(k, data_[id].val_.first)) {
       return data_[id].val_.second;
     }
@@ -354,7 +354,7 @@ const Value &dirko::RobinTable< Key, Value, Hash, Equal >::get(Key k) const
   }
   size_t id = hasher_(k) % slots_;
   size_t cycle = id;
-  while (data_[id].notEmpty_) {
+  while (data_[id].occupied_) {
     if (comparator_(k, data_[id].val_.first)) {
       return data_[id].val_.second;
     }
@@ -437,7 +437,7 @@ dirko::RTIter< Key, Value, Hash, Equal > dirko::RTIter< Key, Value, Hash, Equal 
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RTIter< Key, Value, Hash, Equal >::next()
 {
-  while (id_ < data_->getSize() && !(*data_)[id_].notEmpty_) {
+  while (id_ < data_->getSize() && !(*data_)[id_].occupied_) {
     ++id_;
   }
 }
@@ -445,7 +445,7 @@ void dirko::RTIter< Key, Value, Hash, Equal >::next()
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RTIter< Key, Value, Hash, Equal >::prev()
 {
-  while (id_ > 1 && !(*data_)[id_].notEmpty_) {
+  while (id_ > 1 && !(*data_)[id_].occupied_) {
     --id_;
   }
 }
@@ -522,7 +522,7 @@ dirko::RTCIter< Key, Value, Hash, Equal > dirko::RTCIter< Key, Value, Hash, Equa
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RTCIter< Key, Value, Hash, Equal >::next()
 {
-  while (id_ < data_->getSize() && !(*data_)[id_].notEmpty_) {
+  while (id_ < data_->getSize() && !(*data_)[id_].occupied_) {
     ++id_;
   }
 }
@@ -530,7 +530,7 @@ void dirko::RTCIter< Key, Value, Hash, Equal >::next()
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RTCIter< Key, Value, Hash, Equal >::prev()
 {
-  while (id_ > 1 && !(*data_)[id_].notEmpty_) {
+  while (id_ > 1 && !(*data_)[id_].occupied_) {
     --id_;
   }
 }
