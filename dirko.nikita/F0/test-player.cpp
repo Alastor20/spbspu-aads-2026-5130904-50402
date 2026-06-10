@@ -70,10 +70,11 @@ BOOST_AUTO_TEST_CASE(test_next)
   db.add("All", pl_t{});
   pls_iter_t pl = db.begin();
   pl_iter_t tr = db.get("All").begin();
+  std::ostringstream out("");
   std::istringstream in("./dirko.nikita/F0/tr1.wav t1 ./dirko.nikita/F0/tr2.wav t2 1");
   add(in, std::cout, db, tr, pl, saver);
   add(in, std::cout, db, tr, pl, saver);
-  next(in, std::cout, db, tr, pl, saver);
+  next(in, out, db, tr, pl, saver);
   BOOST_CHECK(tr == ++(db.get("All").begin()));
 }
 BOOST_AUTO_TEST_CASE(test_prev)
@@ -83,10 +84,11 @@ BOOST_AUTO_TEST_CASE(test_prev)
   db.add("All", pl_t{});
   pls_iter_t pl = db.begin();
   pl_iter_t tr = db.get("All").begin();
+  std::ostringstream out("");
   std::istringstream in("./dirko.nikita/F0/tr1.wav t1 ./dirko.nikita/F0/tr2.wav t2 1");
   add(in, std::cout, db, tr, pl, saver);
   add(in, std::cout, db, tr, pl, saver);
-  next(in, std::cout, db, tr, pl, saver);
+  prev(in, out, db, tr, pl, saver);
   BOOST_CHECK(tr == --(db.get("All").end()));
 }
 BOOST_AUTO_TEST_CASE(test_list)
