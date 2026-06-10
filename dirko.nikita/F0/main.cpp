@@ -5,8 +5,6 @@
 #include "player.hpp"
 #include "robin.hpp"
 
-#define USE_FAKE_SDL
-
 int main()
 {
   dirko::pls_t db(5, .7);

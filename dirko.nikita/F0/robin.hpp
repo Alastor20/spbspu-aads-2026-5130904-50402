@@ -1,14 +1,14 @@
 #ifndef ROBIN_HPP
 #define ROBIN_HPP
 
+#include <Vector.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <hasher.hpp>
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include "../common/Vector.hpp"
-#include "../common/hasher.hpp"
 namespace dirko
 {
   template< class Key, class Value >

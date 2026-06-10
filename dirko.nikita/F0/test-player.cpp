@@ -1,6 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include "cmds.hpp"
 #include "player.hpp"
