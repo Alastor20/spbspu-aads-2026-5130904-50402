@@ -9,9 +9,9 @@
 
 dirko::Track::Track(dirko::WavFile wav):
   track_(wav),
-  duration_(static_cast< double >(wav.rawData.getSize()) / wav.byteRate)
+  duration_(static_cast< float >(wav.rawData.getSize()) / wav.byteRate)
 {}
-void dirko::PlayWav(dirko::WavFile &wav, double dur)
+void dirko::PlayWav(dirko::WavFile &wav, float dur)
 {
   if (SDL_Init(SDL_INIT_AUDIO) != 0) {
     throw SDL_GetError();

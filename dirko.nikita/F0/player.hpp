@@ -10,7 +10,7 @@ namespace dirko
   struct Track
   {
     WavFile track_;
-    double duration_;
+    float duration_;
     Track() = default;
     Track(WavFile file);
   };
@@ -21,7 +21,7 @@ namespace dirko
   using pls_iter_t = RTIter< std::string, pl_t >;
   using save_t = RobinTable< std::string, std::string >;
 
-  void PlayWav(dirko::WavFile &wav, double dur);
+  void PlayWav(dirko::WavFile &wav, float dur);
   void save(const save_t &saver, const pls_t &db);
   void load(save_t &saver, std::ostream &out, pls_t &playlists);
 }

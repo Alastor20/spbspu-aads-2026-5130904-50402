@@ -55,13 +55,13 @@ BOOST_AUTO_TEST_CASE(test_play)
   pls_iter_t pl = db.begin();
   pl_iter_t tr = db.get("All").begin();
   std::ostringstream out("");
-  std::istringstream in("./dirko.nikita/F0/tr2.wav t1 t1 1 t1 200");
+  std::istringstream in("./dirko.nikita/F0/tr2.wav t2 t2 1 t2 200");
   add(in, std::cout, db, tr, pl, saver);
   play(in, out, db, tr, pl, saver);
-  BOOST_CHECK(out.str() == "<duration: 6.24327>\n");
+  BOOST_CHECK(out.str() == "<duration: 6.24327>\n<PLAYING: t2 until 1>\n<DONE>\n");
   out.str("");
   play(in, out, db, tr, pl, saver);
-  BOOST_CHECK(out.str() == "<duration: 6.24327>\n<playing until end of track>\n");
+  BOOST_CHECK(out.str() == "<duration: 6.24327>\n<PLAYING: t2 until 6.24327>\n<DONE>\n");
 }
 BOOST_AUTO_TEST_CASE(test_next)
 {

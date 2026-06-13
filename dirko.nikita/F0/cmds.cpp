@@ -13,13 +13,20 @@ namespace
   void playImpl(dirko::pl_iter_t &track, std::istream &in, std::ostream &out)
   {
     out << "<duration: " << (*track).second.duration_ << ">\n";
-    double duration;
+    std::string duration;
     in >> duration;
-    if (duration > (*track).second.duration_) {
-      out << "<playing until end of track>\n";
-      duration = (*track).second.duration_;
+    float dur = 0.0f;
+    if (duration == "END") {
+      dur = (*track).second.duration_;
+    } else {
+      dur = std::stof(duration);
+      if (dur > (*track).second.duration_) {
+        dur = (*track).second.duration_;
+      }
     }
-    PlayWav((*track).second.track_, duration);
+    out << "<PLAYING: " << (*track).first << " until " << dur << ">\n";
+    PlayWav((*track).second.track_, dur);
+    out << "<DONE>\n";
   }
 }
 
