@@ -44,6 +44,7 @@ int main()
         std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
       cmds.get(cmd)(std::cin, std::cout, db, track, playlist, saver);
+      std::cout << '\n';
     } catch (const std::exception &e) {
       std::cout << '<' << e.what() << ">\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

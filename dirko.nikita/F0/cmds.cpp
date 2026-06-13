@@ -26,7 +26,7 @@ namespace
     }
     out << "<PLAYING: " << (*track).first << " until " << dur << ">\n";
     PlayWav((*track).second.track_, dur);
-    out << "<DONE>\n";
+    out << "<DONE>";
   }
 }
 
@@ -56,7 +56,7 @@ void dirko::prev(std::istream &in, std::ostream &out, pls_t &, pl_iter_t &tr, pl
   --tr;
   playImpl(tr, in, out);
 }
-void dirko::add(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
+void dirko::add(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
 {
   std::string path;
   std::string name;
@@ -66,8 +66,9 @@ void dirko::add(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_it
   Track track(wav);
   db.get("All").add(name, track);
   saver.add(name, path);
+  out << "<ADDED " << path << " AS " << name << '>';
 }
-void dirko::remove(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
+void dirko::remove(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
 {
   std::string name;
   in >> name;
@@ -80,8 +81,9 @@ void dirko::remove(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls
       v.second.drop(name);
     }
   }
+  out << "<REMOVED " << name << '>';
 }
-void dirko::rename(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
+void dirko::rename(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &saver)
 {
   std::string from, to;
   in >> from >> to;
@@ -94,17 +96,20 @@ void dirko::rename(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls
       v.second.changeKey(from, to);
     }
   }
+  out << "<RENAMED " << from << " TO " << to << '>';
 }
-void dirko::loop(std::istream &in, std::ostream &, pls_t &, pl_iter_t &tr, pls_iter_t &pl, save_t &)
+void dirko::loop(std::istream &in, std::ostream &out, pls_t &, pl_iter_t &tr, pls_iter_t &pl, save_t &)
 {
   size_t times;
   in >> times;
   if (tr == (*pl).second.end()) {
     tr = (*pl).second.begin();
   }
+  out << "<LOOPING " << times << " TIMES>\n";
   for (size_t i = 0; i < times; ++i) {
     PlayWav((*tr).second.track_, (*tr).second.duration_);
   }
+  out << "<DONE>";
 }
 void dirko::random(std::istream &in, std::ostream &out, pls_t &, pl_iter_t &tr, pls_iter_t &pl, save_t &)
 {
@@ -123,55 +128,67 @@ void dirko::random(std::istream &in, std::ostream &out, pls_t &, pl_iter_t &tr, 
 }
 void dirko::list(std::istream &, std::ostream &out, pls_t &, pl_iter_t &, pls_iter_t &pl, save_t &)
 {
+  out << "<" << (*pl).first;
   for (const std::pair< std::string, Track > &v : (*pl).second) {
-    out << v.first << '\n';
+    out << '\n' << v.first;
   }
+  out << '>';
 }
-void dirko::pl_add(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
+void dirko::pl_add(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string name;
   in >> name;
   db.add(name, pl_t(5, .7));
+  out << "ADDED PLAYLIST " << name << '>';
 }
-void dirko::pl_remove(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
+void dirko::pl_remove(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string name;
   in >> name;
   db.drop(name);
+  out << "REMOVED PLAYLIST " << name << '>';
 }
-void dirko::pl_rename(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
+void dirko::pl_rename(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string from, to;
   in >> from >> to;
   db.changeKey(from, to);
+  out << "RENAMED PLAYLIST " << from << " TO " << to << '>';
 }
-void dirko::pl_add_track(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
+void dirko::pl_add_track(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string playlist, track;
   in >> playlist >> track;
   db.get(playlist).add(track, db.get("All").get(track));
+  out << "ADDED " << track << " IN " << playlist << '>';
 }
-void dirko::pl_remove_track(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
+void dirko::pl_remove_track(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string playlist, track;
   in >> playlist >> track;
   db.get(playlist).drop(track);
+  out << "REMOVED " << track << " FROM " << playlist << '>';
 }
 void dirko::pl_get(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string name;
   in >> name;
-  for (const std::pair< std::string, Track > &v : db.get(name)) {
-    out << v.first << '\n';
+  pl_t playlist = db.get(name);
+  out << "<" << name;
+  for (const std::pair< std::string, Track > &v : playlist) {
+    out << '\n' << v.first;
   }
+  out << '>';
 }
 void dirko::pl_list(std::istream &, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
+  out << "<PLAYLISTS";
   for (const std::pair< std::string, pl_t > &v : db) {
-    out << v.first << '\n';
+    out << '\n' << v.first;
   }
+  out << '>';
 }
-void dirko::pl_merge(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
+void dirko::pl_merge(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string list1, list2, listRes;
   in >> list1 >> list2 >> listRes;
@@ -188,15 +205,17 @@ void dirko::pl_merge(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, p
     }
   }
   db.add(listRes, newList);
+  out << "CREATED " << listRes << '>';
 }
-void dirko::pl_select(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &tr, pls_iter_t &pl, save_t &)
+void dirko::pl_select(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &tr, pls_iter_t &pl, save_t &)
 {
   std::string name;
   in >> name;
   pl = db.getIter(name);
   tr = (*pl).second.begin();
+  out << "<SELECTED " << name << '>';
 }
-void dirko::pl_diff(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
+void dirko::pl_diff(std::istream &in, std::ostream &out, pls_t &db, pl_iter_t &, pls_iter_t &, save_t &)
 {
   std::string list1, list2, listRes;
   in >> list1 >> list2 >> listRes;
@@ -215,4 +234,5 @@ void dirko::pl_diff(std::istream &in, std::ostream &, pls_t &db, pl_iter_t &, pl
     }
   }
   db.add(listRes, newList);
+  out << "CREATED " << listRes << '>';
 }
