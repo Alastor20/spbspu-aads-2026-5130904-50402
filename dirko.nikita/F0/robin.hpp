@@ -161,7 +161,9 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::swap(RobinTable &other) noexc
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RobinTable< Key, Value, Hash, Equal >::clear() noexcept
 {
-  data_.clear();
+  for (size_t i = 0; i < slots_; ++i) {
+    data_[i].occupied_ = false;
+  }
   elements_ = 0;
 }
 
@@ -239,18 +241,11 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::add(Key k, Value v)
     return;
   }
   if (elements_ >= slots_ * max_load_) {
-    rehash(empty() ? 16 : slots_ * 2);
+    rehash(!slots_ ? 16 : slots_ * 2);
   }
   size_t id = hasher_(k) % slots_;
   size_t psl = 0;
-  while (true) {
-    if (!data_[id].occupied_) {
-      data_[id].val_ = {k, v};
-      data_[id].psl_ = psl;
-      data_[id].occupied_ = true;
-      ++elements_;
-      return;
-    }
+  while (data_[id].occupied_) {
     if (data_[id].psl_ < psl) {
       std::swap(k, data_[id].val_.first);
       std::swap(v, data_[id].val_.second);
@@ -259,6 +254,10 @@ void dirko::RobinTable< Key, Value, Hash, Equal >::add(Key k, Value v)
     id = (id + 1) % slots_;
     ++psl;
   }
+  data_[id].val_ = {k, v};
+  data_[id].psl_ = psl;
+  data_[id].occupied_ = true;
+  ++elements_;
 }
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RobinTable< Key, Value, Hash, Equal >::changeKey(Key from, Key to)
