@@ -60,10 +60,12 @@ int main(int argc, char **argv)
   file.close();
 
   using cmd_t = void (*)(std::istream &, std::ostream &, dirko::Datasets &);
-  dirko::BSTree< std::string, cmd_t > commands = {{"print", dirko::cmdPrint},
-                                                  {"complement", dirko::cmdComplement},
-                                                  {"intersect", dirko::cmdIntersect},
-                                                  {"union", dirko::cmdUnion}};
+  dirko::BSTree< std::string, cmd_t > commands;
+  commands.push("print", dirko::cmdPrint);
+  commands.push("complement", dirko::cmdComplement);
+  commands.push("intersect", dirko::cmdIntersect);
+  commands.push("union", dirko::cmdUnion);
+
   std::string cmd;
   while (std::cin >> cmd) {
     try {
