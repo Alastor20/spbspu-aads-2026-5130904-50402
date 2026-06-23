@@ -43,8 +43,6 @@ namespace dirko
 
     void splice(LIter< T > position, List< T > &other) noexcept;
     void splice(LIter< T > position, List< T > &&other) noexcept;
-    void splice(LIter< T > position, List< T > &other, LIter< T > i) noexcept;
-    void splice(LIter< T > position, List< T > &&other, LIter< T > i) noexcept;
   private:
     Node< T > *fake_;
     Node< T > *tail_;
@@ -416,38 +414,6 @@ namespace dirko
   void List< T >::splice(LIter< T > position, List< T > &&other) noexcept
   {
     splice(position, other);
-  }
-
-  template< class T >
-  void List< T >::splice(LIter< T > position, List< T > &other, LIter< T > i) noexcept
-  {
-    if (other.empty() || i == other.end()) {
-      return;
-    }
-    Node< T > *node = i.curr_;
-
-    if (node->prev) {
-      node->prev->next = node->next;
-    }
-    if (node->next) {
-      node->next->prev = node->prev;
-    }
-    other.size_--;
-
-    Node< T > *posNode = position.curr_;
-    node->next = posNode;
-    node->prev = posNode->prev;
-    if (posNode->prev) {
-      posNode->prev->next = node;
-    }
-    posNode->prev = node;
-    size_++;
-  }
-
-  template< class T >
-  void List< T >::splice(LIter< T > position, List< T > &&other, LIter< T > i) noexcept
-  {
-    splice(position, other, i);
   }
 }
 
