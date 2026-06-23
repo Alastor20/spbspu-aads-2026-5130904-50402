@@ -47,6 +47,19 @@ namespace dirko
     void splice(LIter< T > position, List< T > &&other, LIter< T > i) noexcept;
     void splice(LIter< T > position, List< T > &other, LIter< T > first, LIter< T > last) noexcept;
     void splice(LIter< T > position, List< T > &&other, LIter< T > first, LIter< T > last) noexcept;
+    void sort() noexcept;
+
+    template< class Compare >
+    void sort(Compare cmp) noexcept;
+
+    void merge(List< T > &other) noexcept;
+    void merge(List< T > &&other) noexcept;
+
+    template< class Compare >
+    void merge(List< T > &other, Compare cmp) noexcept;
+
+    template< class Compare >
+    void merge(List< T > &&other, Compare cmp) noexcept;
   private:
     Node< T > *fake_;
     Node< T > *tail_;
@@ -483,6 +496,84 @@ namespace dirko
   void List< T >::splice(LIter< T > position, List< T > &&other, LIter< T > first, LIter< T > last) noexcept
   {
     splice(position, other, first, last);
+  }
+
+  template< class T >
+  void List< T >::sort() noexcept
+  {
+    sort(std::less< T >{});
+  }
+
+  template< class T >
+  void List< T >::merge(List< T > &other) noexcept
+  {
+    merge(other, std::less< T >{});
+  }
+
+  template< class T >
+  void List< T >::merge(List< T > &&other) noexcept
+  {
+    merge(other);
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::sort(Compare cmp) noexcept
+  {
+    if (size_ < 2) {
+      return;
+    }
+    LIter< T > mid = begin();
+    for (size_t i = 0; i < size_ / 2; ++i) {
+      ++mid;
+    }
+    List< T > left;
+    left.splice(left.end(), *this, begin(), mid);
+    left.sort(cmp);
+    sort(cmp);
+    merge(left, cmp);
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::merge(List< T > &other, Compare cmp) noexcept
+  {
+    assert(this != std::addressof(other));
+    if (other.empty()) {
+      return;
+    }
+    Node< T > *cur = fake_;
+    Node< T > *p1 = fake_->next;
+    Node< T > *p2 = other.fake_->next;
+    while (p1 && p2) {
+      if (cmp(p2->val, p1->val)) {
+        cur->next = p2;
+        p2->prev = cur;
+        cur = p2;
+        p2 = p2->next;
+      } else {
+        cur->next = p1;
+        p1->prev = cur;
+        cur = p1;
+        p1 = p1->next;
+      }
+    }
+    Node< T > *rest = (p1) ? p1 : p2;
+    Node< T > *restEnd = (p1) ? tail_ : other.tail_;
+    cur->next = rest;
+    rest->prev = cur;
+    restEnd->next = nullptr;
+    tail_ = restEnd;
+    size_ += other.size_;
+    other.tail_ = other.fake_;
+    other.size_ = 0;
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::merge(List< T > &&other, Compare cmp) noexcept
+  {
+    merge(other, cmp);
   }
 }
 
