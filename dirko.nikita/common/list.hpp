@@ -36,13 +36,10 @@ namespace dirko
     void pop_back();
     void clear();
     size_t size() const noexcept;
-    bool empty() const noexcept;
     void swap(List< T > &) noexcept;
     LIter< T > insert(LIter< T > pos, const T &value);
     LIter< T > erase(LIter< T > pos);
 
-    void splice(LIter< T > position, List< T > &other) noexcept;
-    void splice(LIter< T > position, List< T > &&other) noexcept;
   private:
     Node< T > *fake_;
     Node< T > *tail_;
@@ -127,11 +124,6 @@ namespace dirko
   size_t List< T >::size() const noexcept
   {
     return size_;
-  }
-  template< class T >
-  bool List< T >::empty() const noexcept
-  {
-    return !size_;
   }
   template< class T >
   void List< T >::push_front(const T &val)
@@ -387,33 +379,6 @@ namespace dirko
       tail_ = fake_;
     }
     return {next};
-  }
-  template< class T >
-  void List< T >::splice(LIter< T > position, List< T > &other) noexcept
-  {
-    if (other.empty()) {
-      return;
-    }
-    Node< T > *posNode = position.curr_;
-    Node< T > *otherFirst = other.fake_->next;
-    Node< T > *otherLast = other.tail_;
-
-    otherFirst->prev = posNode->prev;
-    if (posNode->prev) {
-      posNode->prev->next = otherFirst;
-    }
-    otherLast->next = posNode;
-    posNode->prev = otherLast;
-
-    size_ += other.size_;
-    other.tail_ = other.fake_;
-    other.size_ = 0;
-  }
-
-  template< class T >
-  void List< T >::splice(LIter< T > position, List< T > &&other) noexcept
-  {
-    splice(position, other);
   }
 }
 
