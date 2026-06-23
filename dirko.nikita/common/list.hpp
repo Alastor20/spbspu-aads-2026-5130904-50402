@@ -60,6 +60,10 @@ namespace dirko
 
     template< class Compare >
     void merge(List< T > &&other, Compare cmp) noexcept;
+
+    template< class Predicate >
+    LIter< T > partition(Predicate pred);
+
   private:
     Node< T > *fake_;
     Node< T > *tail_;
@@ -574,6 +578,28 @@ namespace dirko
   void List< T >::merge(List< T > &&other, Compare cmp) noexcept
   {
     merge(other, cmp);
+  }
+
+  template< class T >
+  template< class Predicate >
+  LIter< T > List< T >::partition(Predicate pred)
+  {
+    List< T > falseList;
+    LIter< T > it = begin();
+    while (it != end()) {
+      LIter< T > next = it;
+      ++next;
+      if (!pred(*it)) {
+        falseList.splice(falseList.end(), *this, it);
+      }
+      it = next;
+    }
+    if (falseList.empty()) {
+      return end();
+    }
+    LIter< T > split = falseList.begin();
+    splice(end(), falseList);
+    return split;
   }
 }
 
