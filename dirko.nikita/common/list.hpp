@@ -45,6 +45,8 @@ namespace dirko
     void splice(LIter< T > position, List< T > &&other) noexcept;
     void splice(LIter< T > position, List< T > &other, LIter< T > i) noexcept;
     void splice(LIter< T > position, List< T > &&other, LIter< T > i) noexcept;
+    void splice(LIter< T > position, List< T > &other, LIter< T > first, LIter< T > last) noexcept;
+    void splice(LIter< T > position, List< T > &&other, LIter< T > first, LIter< T > last) noexcept;
   private:
     Node< T > *fake_;
     Node< T > *tail_;
@@ -448,6 +450,39 @@ namespace dirko
   void List< T >::splice(LIter< T > position, List< T > &&other, LIter< T > i) noexcept
   {
     splice(position, other, i);
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > position, List< T > &other, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (first == last) {
+      return;
+    }
+    Node< T > *fNode = first.curr_;
+    Node< T > *lNode = last.curr_;
+    Node< T > *rangeLast = lNode->prev;
+    if (fNode->prev) {
+      fNode->prev->next = lNode;
+    }
+    lNode->prev = fNode->prev;
+
+    size_t count = std::distance(first, last);
+
+    other.size_ -= count;
+    size_ += count;
+    Node< T > *posNode = position.curr_;
+    fNode->prev = posNode->prev;
+    if (posNode->prev) {
+      posNode->prev->next = fNode;
+    }
+    rangeLast->next = posNode;
+    posNode->prev = rangeLast;
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > position, List< T > &&other, LIter< T > first, LIter< T > last) noexcept
+  {
+    splice(position, other, first, last);
   }
 }
 
