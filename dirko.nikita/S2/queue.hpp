@@ -15,6 +15,9 @@ namespace dirko
     bool empty() const noexcept;
     size_t size() const noexcept;
 
+    template< class... Args >
+    void emplace(Args &&...args);
+
   private:
     List< T > data_;
   };
@@ -54,5 +57,12 @@ template< class T >
 void dirko::Queue< T >::pop() noexcept
 {
   data_.pop_front();
+}
+
+template< class T >
+template< class... Args >
+void dirko::Queue< T >::emplace(Args &&...args)
+{
+  data_.emplace_back(std::forward< Args >(args)...);
 }
 #endif
