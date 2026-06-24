@@ -147,6 +147,18 @@ void dirko::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
       return;
     }
   }
+  bool needRehash = false;
+  if (maxLoadFactor_ > 0.0 && slots_ > 0) {
+    needRehash = loadFactor() >= maxLoadFactor_;
+  }
+  if (!needRehash && maxChainLength_ > 0) {
+    needRehash = (data_[id].size() + 1) >= maxChainLength_;
+  }
+  if (needRehash) {
+    size_t newSlots = resizePolicy_(slots_);
+    rehash(newSlots);
+    id = hasher_(k) % slots_;
+  }
   data_[id].push_back({k, v});
   ++elements_;
 }
