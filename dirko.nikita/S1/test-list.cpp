@@ -216,4 +216,71 @@ BOOST_AUTO_TEST_CASE(test_erase)
   BOOST_CHECK_EQUAL(list.head(), 1);
   BOOST_CHECK_EQUAL(list.tail(), 3);
 }
+
+BOOST_AUTO_TEST_CASE(test_emplace_back)
+{
+  List< std::pair< int, std::string > > list;
+
+  list.emplace_back(10, "hello");
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.tail().first, 10);
+  BOOST_CHECK_EQUAL(list.tail().second, "hello");
+}
+
+BOOST_AUTO_TEST_CASE(test_emplace_front)
+{
+  List< std::pair< int, std::string > > list;
+
+  list.emplace_front(20, "front");
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.head().first, 20);
+  BOOST_CHECK_EQUAL(list.head().second, "front");
+}
+
+BOOST_AUTO_TEST_CASE(test_emplace)
+{
+  List< std::pair< int, std::string > > list;
+
+  list.emplace_back(1, "a");
+  list.emplace_back(3, "c");
+
+  LIter< std::pair< int, std::string > > it = list.begin();
+  ++it;
+
+  it = list.emplace(it, 2, "b");
+
+  BOOST_CHECK_EQUAL(it->first, 2);
+  BOOST_CHECK_EQUAL(it->second, "b");
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_emplace_order)
+{
+  List< int > list;
+
+  list.emplace_back(1);
+  list.emplace_back(2);
+  list.emplace_front(0);
+
+  LIter< int > it = list.begin();
+
+  BOOST_CHECK_EQUAL(*it++, 0);
+  BOOST_CHECK_EQUAL(*it++, 1);
+  BOOST_CHECK_EQUAL(*it, 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_emplace_move)
+{
+  List< std::string > list;
+
+  std::string str = "move_string";
+
+  list.emplace_back(std::move(str));
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.tail(), "move_string");
+}
 BOOST_AUTO_TEST_SUITE_END()

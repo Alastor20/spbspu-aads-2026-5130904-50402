@@ -40,10 +40,53 @@ namespace dirko
     LIter< T > insert(LIter< T > pos, const T &value);
     LIter< T > erase(LIter< T > pos);
 
+    template< class... Args >
+    LIter< T > emplace(LIter< T > pos, Args &&...args);
+    template< class... Args >
+    void emplace_front(Args &&...args);
+    template< class... Args >
+    void emplace_back(Args &&...args);
+
   private:
     Node< T > *fake_;
     Node< T > *tail_;
     size_t size_;
+  };
+  template< class T >
+  class LIter
+  {
+  public:
+    LIter(Node< T > *);
+    T &operator*() const noexcept;
+    T *operator->() const noexcept;
+    LIter &operator++();
+    LIter &operator--();
+    LIter operator++(int);
+    LIter operator--(int);
+    bool operator==(const LIter< T > &) const;
+    bool operator!=(const LIter< T > &) const;
+
+  private:
+    Node< T > *curr_;
+    friend class List< T >;
+  };
+  template< class T >
+  class LCIter
+  {
+  public:
+    LCIter(Node< T > *);
+    const T &operator*() const noexcept;
+    const T *operator->() const noexcept;
+    LCIter &operator++();
+    LCIter &operator--();
+    LCIter operator++(int);
+    LCIter operator--(int);
+    bool operator==(const LCIter< T > &) const;
+    bool operator!=(const LCIter< T > &) const;
+
+  private:
+    const Node< T > *curr_;
+    friend class List< T >;
   };
 
   template< class T >
@@ -224,47 +267,18 @@ namespace dirko
     return tail_->val;
   }
   template< class T >
-  class LIter
-  {
-  public:
-    LIter(Node< T > *);
-    T &operator*() const;
-    LIter &operator++();
-    LIter &operator--();
-    LIter operator++(int);
-    LIter operator--(int);
-    bool operator==(const LIter< T > &) const;
-    bool operator!=(const LIter< T > &) const;
-
-  private:
-    Node< T > *curr_;
-    friend class List< T >;
-  };
-  template< class T >
-  class LCIter
-  {
-  public:
-    LCIter(Node< T > *);
-    const T &operator*() const;
-    LCIter &operator++();
-    LCIter &operator--();
-    LCIter operator++(int);
-    LCIter operator--(int);
-    bool operator==(const LCIter< T > &) const;
-    bool operator!=(const LCIter< T > &) const;
-
-  private:
-    const Node< T > *curr_;
-    friend class List< T >;
-  };
-  template< class T >
   LIter< T >::LIter(Node< T > *node):
     curr_(node)
   {}
   template< class T >
-  T &LIter< T >::operator*() const
+  T &LIter< T >::operator*() const noexcept
   {
     return curr_->val;
+  }
+  template< class T >
+  T *LIter< T >::operator->() const noexcept
+  {
+    return &(curr_->val);
   }
   template< class T >
   bool LIter< T >::operator==(const LIter< T > &rhs) const
@@ -307,9 +321,14 @@ namespace dirko
     curr_(node)
   {}
   template< class T >
-  const T &LCIter< T >::operator*() const
+  const T &LCIter< T >::operator*() const noexcept
   {
     return curr_->val;
+  }
+  template< class T >
+  const T *LCIter< T >::operator->() const noexcept
+  {
+    return &(curr_->val);
   }
   template< class T >
   bool LCIter< T >::operator==(const LCIter< T > &rhs) const
@@ -379,6 +398,41 @@ namespace dirko
       tail_ = fake_;
     }
     return {next};
+  }
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplace(LIter< T > pos, Args &&...args)
+  {
+    Node< T > *posNode = pos.curr_;
+    Node< T > *newNode = new Node< T >{T(std::forward< Args >(args)...), posNode, posNode->prev};
+    if (posNode->prev) {
+      posNode->prev->next = newNode;
+    }
+    posNode->prev = newNode;
+    size_++;
+    return LIter< T >{newNode};
+  }
+  template< class T >
+  template< class... Args >
+  void List< T >::emplace_front(Args &&...args)
+  {
+    Node< T > *node = new Node< T >{T(std::forward< Args >(args)...), fake_->next, nullptr};
+    if (fake_->next) {
+      fake_->next->prev = node;
+    } else {
+      tail_ = node;
+    }
+    fake_->next = node;
+    size_++;
+  }
+  template< class T >
+  template< class... Args >
+  void List< T >::emplace_back(Args &&...args)
+  {
+    Node< T > *node = new Node< T >{T(std::forward< Args >(args)...), nullptr, tail_};
+    tail_->next = node;
+    tail_ = node;
+    size_++;
   }
 }
 
