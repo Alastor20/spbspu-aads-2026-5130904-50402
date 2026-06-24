@@ -6,12 +6,22 @@
 #include <hasher.hpp>
 #include <initializer_list>
 #include <list.hpp>
-#include <memory>
 #include <stdexcept>
 #include <utility>
 
 namespace dirko
 {
+  namespace inner
+  {
+    class Resizer
+    {
+    public:
+      size_t operator()(size_t before) const noexcept
+      {
+        return before < 10 ? 20 : before * 2;
+      }
+    };
+  }
   template< class Key, class Value, class Hash, class Equal >
   class HTIter;
   template< class Key, class Value, class Hash, class Equal >
@@ -37,12 +47,16 @@ namespace dirko
     HTCIt cbegin() const noexcept;
     HTCIt cend() const noexcept;
 
-    double loadFactor() const noexcept;
-
     void clear() noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
     void swap(HashTable &other) noexcept;
+
+    double loadFactor() const noexcept;
+    size_t maxChainLength() const noexcept;
+    void setMaxLoadFactor(double maxLf) noexcept;
+    void setMaxChainLength(size_t maxLen) noexcept;
+    void setResizePolicy(std::function< size_t(size_t) > policy) noexcept;
 
   private:
     Vector< List< std::pair< Key, Value > > > data_;
@@ -50,6 +64,9 @@ namespace dirko
     Equal comparator_;
     size_t slots_;
     size_t elements_;
+    double maxLoadFactor_;
+    size_t maxChainLength_;
+    std::function< size_t(size_t) > resizePolicy_;
     friend class HTIter< Key, Value, Hash, Equal >;
     friend class HTCIter< Key, Value, Hash, Equal >;
   };
@@ -99,7 +116,10 @@ dirko::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   hasher_(Hash{}),
   comparator_(Equal{}),
   slots_(slots),
-  elements_(0)
+  elements_(0),
+  maxLoadFactor_(0.75),
+  maxChainLength_(10),
+  resizePolicy_(inner::Resizer{})
 {
   data_.reserve(slots_);
   for (size_t i = 0; i < slots_; ++i) {
