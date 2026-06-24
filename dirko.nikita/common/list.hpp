@@ -57,7 +57,8 @@ namespace dirko
   {
   public:
     LIter(Node< T > *);
-    T &operator*() const;
+    T &operator*() const noexcept;
+    T *operator->() const noexcept;
     LIter &operator++();
     LIter &operator--();
     LIter operator++(int);
@@ -74,7 +75,8 @@ namespace dirko
   {
   public:
     LCIter(Node< T > *);
-    const T &operator*() const;
+    const T &operator*() const noexcept;
+    const T *operator->() const noexcept;
     LCIter &operator++();
     LCIter &operator--();
     LCIter operator++(int);
@@ -269,9 +271,14 @@ namespace dirko
     curr_(node)
   {}
   template< class T >
-  T &LIter< T >::operator*() const
+  T &LIter< T >::operator*() const noexcept
   {
     return curr_->val;
+  }
+  template< class T >
+  T *LIter< T >::operator->() const noexcept
+  {
+    return &(curr_->val);
   }
   template< class T >
   bool LIter< T >::operator==(const LIter< T > &rhs) const
@@ -314,9 +321,14 @@ namespace dirko
     curr_(node)
   {}
   template< class T >
-  const T &LCIter< T >::operator*() const
+  const T &LCIter< T >::operator*() const noexcept
   {
     return curr_->val;
+  }
+  template< class T >
+  const T *LCIter< T >::operator->() const noexcept
+  {
+    return &(curr_->val);
   }
   template< class T >
   bool LCIter< T >::operator==(const LCIter< T > &rhs) const
