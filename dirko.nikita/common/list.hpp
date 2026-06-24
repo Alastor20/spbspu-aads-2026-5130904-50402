@@ -30,10 +30,12 @@ namespace dirko
     T &tail() noexcept;
     const T &chead() const noexcept;
     const T &ctail() const noexcept;
+
     void push_front(const T &);
     void push_back(const T &);
     void pop_front();
     void pop_back();
+
     void clear();
     size_t size() const noexcept;
     void swap(List< T > &) noexcept;
