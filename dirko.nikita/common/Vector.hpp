@@ -87,18 +87,6 @@ namespace dirko
 
     void clear();
 
-    void insert(size_t i, const T &val);
-    void erase(size_t i);
-    void insert(size_t i, const Vector< T > &rhs, size_t beg, size_t end);
-    void erase(size_t beg, size_t end);
-
-    void insert(VIter< T > pos, VIter< T > beg, VIter< T > end);
-    void insert(VIter< T > pos, const T &value);
-    void insert(const T &value, size_t count, VIter< T > pos);
-    void erase(VIter< T > beg, VIter< T > end);
-    void erase(VIter< T > pos);
-    void erase(VIter< T > pos, size_t count);
-
     VIter< T > begin();
     VCIter< T > cbegin() const;
     VIter< T > end();
@@ -287,87 +275,6 @@ const T &dirko::Vector< T >::at(size_t id) const
     return data_[id];
   }
   throw std::out_of_range("bad id");
-}
-
-template< class T >
-void dirko::Vector< T >::insert(size_t i, const T &val)
-{
-  if (i > size_) {
-    throw std::out_of_range("index out of range");
-  }
-  Vector< T > cpy(size_ + 1);
-  for (; cpy.size_ < i; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_]);
-  }
-  new (cpy.data_ + cpy.size_++) T(val);
-  for (; cpy.size_ < size_ + 1; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_ - 1]);
-  }
-  swap(cpy);
-}
-
-template< class T >
-void dirko::Vector< T >::erase(size_t i)
-{
-  if (i >= size_) {
-    throw std::out_of_range("index out of range");
-  }
-  Vector< T > cpy(size_ - 1);
-  for (; cpy.size_ < i; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_]);
-  }
-  for (; cpy.size_ < size_ - 1; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_ + 1]);
-  }
-  swap(cpy);
-}
-
-template< class T >
-void dirko::Vector< T >::insert(size_t i, const Vector< T > &rhs, size_t beg, size_t end)
-{
-  if (i > size_) {
-    throw std::out_of_range("index out of range");
-  }
-  if (end > rhs.getSize()) {
-    throw std::range_error("end index more than size of rhs");
-  }
-  if (end < beg) {
-    throw std::range_error("end less than begin");
-  }
-  size_t toAdd = end - beg;
-  Vector< T > cpy(size_ + toAdd);
-  for (; cpy.size_ < i; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_]);
-  }
-  for (; cpy.size_ < i + toAdd; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T(rhs[beg + cpy.size_ - i]);
-  }
-  for (; cpy.size_ < size_ + toAdd; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_ - toAdd]);
-  }
-  swap(cpy);
-}
-template< class T >
-void dirko::Vector< T >::erase(size_t beg, size_t end)
-{
-  if (!size_) {
-    throw std::out_of_range("empty vector");
-  }
-  if (end > size_) {
-    throw std::range_error("end is greater than size");
-  }
-  if (beg > end) {
-    throw std::range_error("begin is greater than end");
-  }
-  size_t toRemove = end - beg;
-  Vector< T > cpy(size_ - toRemove);
-  for (; cpy.size_ < beg; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_]);
-  }
-  for (; cpy.size_ < size_ - toRemove; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this)[cpy.size_ + toRemove]);
-  }
-  swap(cpy);
 }
 
 template< class T >
@@ -577,64 +484,5 @@ dirko::VIter< T > dirko::VIter< T >::operator+(size_t i) noexcept
 {
   VIter< T > iter(v_, pos_ + i);
   return iter;
-}
-template< class T >
-void dirko::Vector< T >::erase(VIter< T > pos, size_t count)
-{
-  erase(pos.pos_, pos.pos_ + count);
-}
-
-template< class T >
-void dirko::Vector< T >::erase(VIter< T > pos)
-{
-  erase(pos.pos_);
-}
-
-template< class T >
-void dirko::Vector< T >::erase(VIter< T > beg, VIter< T > end)
-{
-  erase(beg.pos_, end.pos_);
-}
-template< class T >
-void dirko::Vector< T >::insert(const T &value, size_t count, VIter< T > pos)
-{
-  Vector< T > cpy(size_ + count);
-  for (; cpy.size_ < pos.pos_; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this).at(cpy.size_));
-  }
-  for (size_t i = 0; i < count; ++i) {
-    new (cpy.data_ + cpy.size_++) T(value);
-  }
-  for (; pos != (*this).end(); ++pos) {
-    new (cpy.data_ + cpy.size_++) T(*pos);
-  }
-  swap(cpy);
-}
-
-template< class T >
-void dirko::Vector< T >::insert(VIter< T > pos, const T &val)
-{
-  insert(pos.pos_, val);
-}
-template< class T >
-void dirko::Vector< T >::insert(VIter< T > pos, VIter< T > beg, VIter< T > end)
-{
-  size_t count = 0;
-  VIter< T > cpyBeg = beg;
-  while (cpyBeg != end) {
-    ++count;
-    ++cpyBeg;
-  }
-  Vector< T > cpy(size_ + count);
-  for (; cpy.size_ < pos.pos_; ++cpy.size_) {
-    new (cpy.data_ + cpy.size_) T((*this).at(cpy.size_));
-  }
-  for (; beg != end; ++beg) {
-    new (cpy.data_ + cpy.size_++) T(*beg);
-  }
-  for (; pos != (*this).end(); ++pos) {
-    new (cpy.data_ + cpy.size_++) T(*pos);
-  }
-  swap(cpy);
 }
 #endif
