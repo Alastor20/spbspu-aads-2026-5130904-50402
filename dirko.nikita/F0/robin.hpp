@@ -213,7 +213,7 @@ dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Eq
 {
   VIter< RobinNode< Key, Value > > val = data_.begin();
   for (; val != data_.end(); ++val) {
-    if ((*val).val_.first == key && (*val).occupied_) {
+    if ((*val).occupied_ && (*val).val_.first == key) {
       break;
     }
   }
@@ -223,6 +223,20 @@ dirko::RTIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Eq
   return RTIter< Key, Value, Hash, Equal >(std::addressof(data_), val.getID());
 }
 
+template< class Key, class Value, class Hash, class Equal >
+dirko::RTCIter< Key, Value, Hash, Equal > dirko::RobinTable< Key, Value, Hash, Equal >::getCIter(const Key &key) const
+{
+  VCIter< RobinNode< Key, Value > > val = data_.begin();
+  for (; val != data_.end(); ++val) {
+    if ((*val).occupied_ && (*val).val_.first == key) {
+      break;
+    }
+  }
+  if (val == data_.end()) {
+    throw std::invalid_argument("no such key");
+  }
+  return RTCIter< Key, Value, Hash, Equal >(std::addressof(data_), val.getID());
+}
 template< class Key, class Value, class Hash, class Equal >
 void dirko::RobinTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 {
